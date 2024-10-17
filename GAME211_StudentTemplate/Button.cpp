@@ -34,10 +34,10 @@ bool Button::OnCreate() {
 	w = static_cast<int>(image->w * scale);
 	h = static_cast<int>(image->h * scale);
 
-	square.w = static_cast<int>(screenCoords.x - 0.5f * w);
+	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
 	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
 	square.w = w;
-	square.y = h;
+	square.h = h;
 	
 	return true;
 }

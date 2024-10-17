@@ -35,7 +35,7 @@ bool Scene1::OnCreate() {
 	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(texture);
 
-	start = new Button("clyde.png", this);
+	start = new Button("Clyde.png", this);
 	if (!start->OnCreate()) {
 		return false;
 	}
