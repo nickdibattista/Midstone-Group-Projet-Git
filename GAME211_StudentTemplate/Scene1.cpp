@@ -56,7 +56,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 
 	//render Button
-	start->Render();
+	//start->Render();
 
 	// render the player
 	game->RenderPlayer(0.10f);
