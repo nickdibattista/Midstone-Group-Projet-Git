@@ -21,6 +21,7 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
+	inverseProjection = MMath::inverse(projectionMatrix);
 
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
@@ -35,7 +36,7 @@ bool Scene1::OnCreate() {
 	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(texture);
 
-	start = new Button("Clyde.png", this);
+	start = new Button("Clyde.png", Vec3(10.0f, 8.0f, 0.0f), this);
 	if (!start->OnCreate()) {
 		return false;
 	}
@@ -56,7 +57,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 
 	//render Button
-	//start->Render();
+	start->Render();
 
 	// render the player
 	game->RenderPlayer(0.10f);
@@ -68,4 +69,27 @@ void Scene1::HandleEvents(const SDL_Event& event)
 {
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+
+	Vec3 mousePos = getMousePosition();
+
+	if (event.button.type == SDL_MOUSEBUTTONUP
+		&& event.button.button == SDL_BUTTON_LEFT)
+	{
+		if (start->clicked(mousePos))
+		{
+			printf("mouse clicked start\n");
+		}
+	}
+
+}
+
+Vec3 Scene1::getMousePosition()
+{
+
+	Uint32 buttons;
+	int x, y;
+	buttons = SDL_GetMouseState(&x, &y);
+	Vec3 mouseScreenCoords = Vec3(float(x), float(y), 0.0f);
+	Vec3 mouseWorldCoords = inverseProjection * (mouseScreenCoords);
+	return mouseWorldCoords;
 }
