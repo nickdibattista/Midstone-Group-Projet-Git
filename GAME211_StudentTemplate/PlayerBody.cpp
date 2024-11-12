@@ -55,6 +55,36 @@ void PlayerBody::Render( float scale )
 
 void PlayerBody::HandleEvents( const SDL_Event& event )
 {
+    // player presses down key
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) 
+    {
+        switch (event.key.keysym.scancode)
+        {
+        case SDL_SCANCODE_A:
+            vel.x = -3.0f;
+            break;
+        case SDL_SCANCODE_D:
+            vel.x = 3.0f;
+            break;
+        case SDL_SCANCODE_SPACE:
+            // add jump force
+            break;
+        }
+    }
+
+    // if player releases key 
+    if (event.type == SDL_KEYUP && event.key.repeat == 0)
+    {
+        switch (event.key.keysym.scancode)
+        {
+        case SDL_SCANCODE_A:
+            vel.x = 0.0f;
+            break;
+        case SDL_SCANCODE_D:
+            vel.x = 0.0f;
+            break;
+        }
+    }
 }
 
 void PlayerBody::Update( float deltaTime )
