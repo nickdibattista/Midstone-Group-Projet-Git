@@ -1,10 +1,12 @@
 #include "Button.h"
 #include "Vector.h"
 
-Button::Button(const string &fileName, Scene* owner_) {
+Button::Button(const string &fileName, Scene* owner_, Vec3 pos_) {
 	scene = owner_; 
 
 	image = IMG_Load(fileName.c_str());
+
+	pos = pos_;
 }
 
 

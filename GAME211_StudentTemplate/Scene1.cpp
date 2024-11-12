@@ -97,8 +97,6 @@ void Scene1::Render() {
 	Vec3 screenCoords = projectionMatrix * game->getPlayer()->getPos();
 	SDL_Rect dscrect = {screenCoords.x , screenCoords.y, 64, 128};
 
-	SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
-
 	SDL_RenderPresent(renderer);
 }
 

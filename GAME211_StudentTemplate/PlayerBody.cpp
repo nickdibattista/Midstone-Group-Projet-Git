@@ -33,7 +33,7 @@ void PlayerBody::Render( float scale )
     // convert the position from game coords to screen coords.
     screenCoords = projectionMatrix * pos;
 
-    // Scale the image, in case the .png file is too big or small
+    // Scale the image, in casg file is too big or small
     w = image->w * scale;
     h = image->h * scale;
 

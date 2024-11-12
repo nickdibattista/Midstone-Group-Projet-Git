@@ -19,9 +19,10 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect square; 
 	Scene* scene;
+	Vec3 pos;
 
 public:
-	Button(const string &fileName, Scene* owner_);
+	Button(const string &fileName, Scene* owner_, Vec3 pos_);
 	~Button();
 	bool OnCreate();
 	void Render();

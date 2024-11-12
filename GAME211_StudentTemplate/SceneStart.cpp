@@ -43,6 +43,20 @@ bool SceneStart::OnCreate() {
 	}
 	Background = SDL_CreateTextureFromSurface(renderer, image);
 
+	// load start button texture
+	start = new Button("Sprites/StartButton.png", this);
+	if (!start->OnCreate()) {
+		std::cerr << "no start button" << std::endl;
+		return false;
+	}
+
+	// load exit button texture
+	exit = new Button("Sprites/ExitButton.png", this);
+	if (!exit->OnCreate()) {
+		std::cerr << "no exit button" << std::endl;
+		return false;
+	}
+
 	SDL_FreeSurface(image);
 	return true;
 }
@@ -103,6 +117,8 @@ void SceneStart::Render() {
 
 	SDL_RenderCopyEx(renderer, Logo, nullptr, &square,
 		orientationDegrees, nullptr, SDL_FLIP_NONE);
+
+	start->Render();
 
 	SDL_RenderPresent(renderer);
 }
