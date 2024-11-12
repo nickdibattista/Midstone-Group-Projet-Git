@@ -30,7 +30,7 @@ private:
 	void handleEvents();
 	void LoadScene(int i);
 	bool ValidateCurrentScene();
-
+	SDL_Texture* walkAnim;
 
 public:
 	GameManager();

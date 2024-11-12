@@ -1,9 +1,9 @@
-#include "Scene1.h"
+#include "Scene0.h"
 #include <VMath.h>
 #include "Button.h"
 
 // See notes about this constructor in Scene1.h.
-Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
+Scene0::Scene0(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
     game = game_;
 	renderer = SDL_GetRenderer(window);
@@ -12,10 +12,10 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	walkAnim = NULL;
 }
 
-Scene1::~Scene1(){
+Scene0::~Scene0(){
 }
 
-bool Scene1::OnCreate() {
+bool Scene0::OnCreate() {
 	int w, h;
 	SDL_GetWindowSize(window,&w,&h);
 
@@ -33,37 +33,34 @@ bool Scene1::OnCreate() {
 	SDL_Surface* image;
 	SDL_Texture* texture;
 
-	//image = IMG_Load("pacman.png");
-	//texture = SDL_CreateTextureFromSurface(renderer, image);
+	image = IMG_Load("pacman.png");
+	texture = SDL_CreateTextureFromSurface(renderer, image);
 
-	//start = new Button("Clyde.png", Vec3(10.0f, 8.0f, 0.0f), this);
-	//if (!start->OnCreate()) {
-	//	return false;
-	//}
+	start = new Button("Clyde.png", Vec3(10.0f, 8.0f, 0.0f), this);
+	if (!start->OnCreate()) {
+		return false;
+	}
 
 	image = IMG_Load("MikeyMountaintopWalk.png");
 	walkAnim = SDL_CreateTextureFromSurface(renderer, image);
-
-	game->getPlayer()->setImage(image);
 	SDL_FreeSurface(image);
+	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(walkAnim);
 
 	
-	
-
 
 	return true;
 }
 
-void Scene1::OnDestroy() {}
+void Scene0::OnDestroy() {}
 
-void Scene1::Update(const float deltaTime) {
+void Scene0::Update(const float deltaTime) {
 
 	// Update player
 	game->getPlayer()->Update(deltaTime);
 }
 
-void Scene1::Render() {
+void Scene0::Render() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
@@ -76,15 +73,15 @@ void Scene1::Render() {
 	SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
 
 	//render Button
-	//start->Render();
+	start->Render();
 
 	// render the player
-	game->RenderPlayer(0.25f);
+	game->RenderPlayer(0.10f);
 
 	SDL_RenderPresent(renderer);
 }
 
-void Scene1::HandleEvents(const SDL_Event& event)
+void Scene0::HandleEvents(const SDL_Event& event)
 {
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
@@ -102,7 +99,7 @@ void Scene1::HandleEvents(const SDL_Event& event)
 
 }
 
-Vec3 Scene1::getMousePosition()
+Vec3 Scene0::getMousePosition()
 {
 
 	Uint32 buttons;

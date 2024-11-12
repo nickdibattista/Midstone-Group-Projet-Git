@@ -16,7 +16,7 @@ class PlayerBody : public Body
 {
 protected:
     class GameManager* game;
-
+    SDL_Texture* walkAnim;
 public:
     PlayerBody() : Body{}
     {
