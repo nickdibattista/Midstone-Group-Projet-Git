@@ -108,8 +108,8 @@ void PlayerBody::Update( float deltaTime )
 {
     // Update position, call Update from base class
     // Note that would update velocity too, and rotation motion
-
     Body::Update( deltaTime );
-
+    Body::ApplyForce(Vec3(0.0f, -force, 0.0f));
+    force = force + 0.1;
 }
 
