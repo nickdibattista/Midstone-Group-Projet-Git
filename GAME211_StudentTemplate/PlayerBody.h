@@ -46,7 +46,7 @@ public:
     }
         , game{ game_ }
     {}
-    
+    float force = 0.5;
     // use the base class versions of getters
 
     bool OnCreate();

@@ -54,15 +54,62 @@ void PlayerBody::Render( float scale )
 }
 
 void PlayerBody::HandleEvents( const SDL_Event& event )
-{
+{ 
+    float maxSpeed = 2.0f;
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) 
+    {
+       
+        switch (event.key.keysym.scancode)
+        {
+        case SDL_SCANCODE_W:
+            vel.y = maxSpeed * 1.0f;
+            break;
+        case SDL_SCANCODE_A:
+            vel.x = maxSpeed * -1.0f;
+            break;
+        case SDL_SCANCODE_S:
+            vel.y = maxSpeed * -1.0f;
+            break;            
+        case SDL_SCANCODE_D:
+            vel.x = maxSpeed * 1.0f;
+            break;
+        }
+    }
+    //when key released, stop moving
+    if (event.type == SDL_KEYUP) //&& event.key.repeat == 0
+    {
+        float maxSpeed = 1.0f;
+        switch (event.key.keysym.scancode)
+        {
+        case SDL_SCANCODE_W:
+            vel.y = 0.0f;
+            break;
+        case SDL_SCANCODE_A:
+            vel.x = 0.0f;
+            break;
+        case SDL_SCANCODE_S:
+            vel.y = 0.0f;
+            break;
+        case SDL_SCANCODE_D:
+            vel.x = 0.0f;
+            break;
+        }
+    }
+
+    //normalize velocity
+
+    if (VMath::mag(vel) > VERY_SMALL)
+    {
+        vel = VMath::normalize(vel) * maxSpeed;
+    }
 }
 
 void PlayerBody::Update( float deltaTime )
 {
     // Update position, call Update from base class
     // Note that would update velocity too, and rotation motion
-
     Body::Update( deltaTime );
-
+    Body::ApplyForce(Vec3(0.0f, -force, 0.0f));
+    force = force + 0.1;
 }
 
