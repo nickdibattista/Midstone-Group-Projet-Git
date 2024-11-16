@@ -32,9 +32,11 @@ bool Scene1::OnCreate() {
 
 	// Set animation to texture;
 	// TODO move this to the player class
+	/*
 	image = IMG_Load("Sprites/MikeyMountaintopWalk.png");
 	walkAnim = SDL_CreateTextureFromSurface(renderer, image);
 	SDL_FreeSurface(image);
+	*/
 	//TODO error checking
 
 	plat1 = new FlatImage("Sprites/Platform1.png", this);
@@ -87,17 +89,8 @@ void Scene1::Render() {
 
 	plat1->Render(scale, pos);
 
-	// frame rate of animation
-	Uint32 ticks = SDL_GetTicks();
-	Uint32 sprite = (ticks / 100) % 4;
-
-	// cut animation, place it in world, resize it.
-	SDL_Rect srcrect = { sprite * 48, 0, 32, 64 };
-	screenCoords = projectionMatrix * game->getPlayer()->getPos();
-	SDL_Rect dscrect = {screenCoords.x , screenCoords.y, 64, 128};
-
-	SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
-
+	// render player
+	game->getPlayer()->Render(scale);
 
 	SDL_RenderPresent(renderer);
 }

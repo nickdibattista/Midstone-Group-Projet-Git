@@ -9,11 +9,11 @@
 
 bool PlayerBody::OnCreate()
 {
-    image = IMG_Load( "Pacman.png" );
+    image = IMG_Load("Sprites/MikeyMountaintopWalk.png");
     SDL_Renderer *renderer = game->getRenderer();
-    texture = SDL_CreateTextureFromSurface( renderer, image );
+    walkAnim = SDL_CreateTextureFromSurface( renderer, image );
     if (image == nullptr) {
-        std::cerr << "Can't open the image" << std::endl;
+        std::cerr << "Can't open the player sprite" << std::endl;
         return false;
     }
     return true;
@@ -26,31 +26,21 @@ void PlayerBody::Render( float scale )
     Matrix4 projectionMatrix = game->getProjectionMatrix();
 
     // square represents the position and dimensions for where to draw the image
-    SDL_Rect square;
     Vec3 screenCoords;
-    float    w, h;
 
     // convert the position from game coords to screen coords.
     screenCoords = projectionMatrix * pos;
 
-    // Scale the image, in casg file is too big or small
-    w = image->w * scale;
-    h = image->h * scale;
+    // frame rate of animation
+    Uint32 ticks = SDL_GetTicks();
+    Uint32 sprite = (ticks / 100) % 4;
 
-    // The square's x and y values represent the top left corner of 
-    // where SDL will draw the .png image.
-    // The 0.5f * w/h offset is to place the .png so that pos represents the center
-    // (Note the y axis for screen coords points downward, hence subtraction!!!!)
-    square.x = static_cast<int>(screenCoords.x - 0.5f * w);
-    square.y = static_cast<int>(screenCoords.y - 0.5f * h);
-    square.w = static_cast<int>(w);
-    square.h = static_cast<int>(h);
+    // cut animation, place it in world, resize it.
+    SDL_Rect srcrect = { sprite * 48, 0, 32, 64 };
+    screenCoords = projectionMatrix * getPos();
+    SDL_Rect dscrect = { screenCoords.x , screenCoords.y, 64, 128 };
 
-    // Convert character orientation from radians to degrees.
-    float orientationDegrees = orientation * 180.0f / M_PI ;
-
-    SDL_RenderCopyEx( renderer, texture, nullptr, &square,
-        orientationDegrees, nullptr, SDL_FLIP_NONE );
+    SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
 }
 
 void PlayerBody::HandleEvents( const SDL_Event& event )
