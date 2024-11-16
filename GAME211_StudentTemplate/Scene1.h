@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "Button.h"
 #include "TileMap.h"
+#include "FlatImage.h"
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -18,6 +19,8 @@ private:
     Matrix4     inverseProjection;	// set in OnCreate()
 	Button* start;
 	SDL_Texture* walkAnim;
+	Vec3 gravity;
+	FlatImage* plat1;
 
 public:
 	// This constructor may be different from what you've seen before

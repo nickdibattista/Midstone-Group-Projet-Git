@@ -53,6 +53,7 @@ public:
     void Render( float scale = 1.0f );
     void HandleEvents( const SDL_Event& event );
     void Update( float deltaTime );
+    void ApplyForce(Vec3 force);
     void setTexture( SDL_Texture* texture_ ) { texture = texture_; }
     
 };

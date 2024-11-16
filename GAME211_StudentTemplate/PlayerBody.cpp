@@ -96,3 +96,7 @@ void PlayerBody::Update( float deltaTime )
 
 }
 
+void PlayerBody::ApplyForce(Vec3 force) {
+    Body::ApplyForce(force);
+}
+

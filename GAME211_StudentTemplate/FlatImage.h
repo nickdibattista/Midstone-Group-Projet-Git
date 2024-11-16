@@ -1,5 +1,5 @@
-#ifndef BUTTON_H
-#define BUTTON_H
+#ifndef FLATIMAGE_H
+#define FLATIMAGE_H
 
 #include <SDL.h>
 #include <iostream>
@@ -12,19 +12,19 @@ using namespace MATH;
 
 
 
-class Button
+class FlatImage
 {
 private:
 	SDL_Surface* image;
 	SDL_Texture* texture;
-	SDL_Rect square; 
+	SDL_Rect square;
 	Scene* scene;
 
 public:
-	Button(const string &fileName, Scene* owner_);
-	~Button();
+	FlatImage(const string& fileName, Scene* owner_);
+	~FlatImage();
 	bool OnCreate();
 	void Render(float scale = 1.0f, Vec3 pos = Vec3());
 };
 
-#endif // !BUTTON_H
+#endif // !FLATIMAGE_H

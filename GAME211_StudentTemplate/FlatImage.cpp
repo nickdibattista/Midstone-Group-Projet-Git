@@ -1,33 +1,33 @@
-#include "Button.h"
+#include "FlatImage.h"
 #include "Vector.h"
 
-Button::Button(const string &fileName, Scene* owner_) {
-	scene = owner_; 
+FlatImage::FlatImage(const string& fileName, Scene* owner_) {
+	scene = owner_;
 
 	image = IMG_Load(fileName.c_str());
 }
 
 
-Button::~Button() {
+FlatImage::~FlatImage() {
 
 }
 
 
-bool Button::OnCreate() {
+bool FlatImage::OnCreate() {
 	SDL_Renderer* renderer;
 	SDL_Window* window = scene->getWindow();
 	renderer = SDL_GetRenderer(window);
 
 	texture = SDL_CreateTextureFromSurface(renderer, image);
-	
+
 	if (image == nullptr) {
 		std::cerr << "Can't open image" << std::endl;
 	}
-	
+
 	return true;
 }
 
-void Button::Render(float scale, Vec3 pos) {
+void FlatImage::Render(float scale, Vec3 pos) {
 	int		w, h;
 	Vec3 screenCoords;
 
@@ -45,7 +45,7 @@ void Button::Render(float scale, Vec3 pos) {
 	square.h = h;
 
 	SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
-	
+
 
 	//con from rads to degrees
 

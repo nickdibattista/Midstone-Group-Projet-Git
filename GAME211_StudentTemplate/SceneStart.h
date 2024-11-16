@@ -5,6 +5,7 @@
 #include <MMath.h>
 #include "Scene.h"
 #include "Button.h"
+#include "FlatImage.h"
 
 using namespace MATH;
 class SceneStart : public Scene {
@@ -15,8 +16,8 @@ private:
 	SDL_Renderer* renderer;	// the renderer associated with SDL window
 	Matrix4 projectionMatrix;	// set in OnCreate()
 	Matrix4 inverseProjection;	// set in OnCreate()
-	SDL_Texture* Logo; //set in OnCreate()
-	SDL_Texture* Background; //set in OnCreate()
+	FlatImage* Logo; //set in OnCreate()
+	FlatImage* Background; //set in OnCreate()
 	Button* start; //set in OnCreate()
 	Button* exit; //set in OnCreate()
 

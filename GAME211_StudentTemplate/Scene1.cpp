@@ -10,6 +10,7 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	xAxis = 25.0f;
 	yAxis = 15.0f;
 	walkAnim = NULL;
+	gravity = Vec3(0.0f, -4.0f, 0.0f);
 }
 
 Scene1::~Scene1(){
@@ -26,28 +27,21 @@ bool Scene1::OnCreate() {
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
-	// Set player image to PacMan
-
 	SDL_Surface* image;
 	SDL_Texture* texture;
 
-	image = IMG_Load("pacman.png");
-	texture = SDL_CreateTextureFromSurface(renderer, image);
-	game->getPlayer()->setImage(image);
-	game->getPlayer()->setTexture(texture);
-
-	start = new Button("Clyde.png", this);
-	if (!start->OnCreate()) {
-		return false;
-	}
-
-	//SDL_Surface* image;
+	// Set animation to texture;
+	// TODO move this to the player class
 	image = IMG_Load("Sprites/MikeyMountaintopWalk.png");
 	walkAnim = SDL_CreateTextureFromSurface(renderer, image);
 	SDL_FreeSurface(image);
 	//TODO error checking
 
-	
+	plat1 = new FlatImage("Sprites/Platform1.png", this);
+	if (!plat1->OnCreate()) {
+		std::cerr << "no Platform 1" << std::endl;
+		return false;
+	}
 
 	return true;
 }
@@ -55,7 +49,7 @@ bool Scene1::OnCreate() {
 void Scene1::OnDestroy() {}
 
 void Scene1::Update(const float deltaTime) {
-	// update screen position
+	//  ------------- update screen position -----------------------
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
 
@@ -68,34 +62,42 @@ void Scene1::Update(const float deltaTime) {
 	bottom = game->getPlayer()->getPos().y - yAxis / 2.0f;
 	top = game->getPlayer()->getPos().y + yAxis / 2.0f;
 
-	/*Matrix4 ortho = MMath::orthographic(left, right, bottom, top, 0.0f, 1.0f);
-	projectionMatrix = ndc * ortho;*/
+	Matrix4 ortho = MMath::orthographic(left, right, bottom, top, 0.0f, 1.0f);
+	projectionMatrix = ndc * ortho;
 	std::cout << left << " " << bottom << std::endl;
+	//  ------------- update screen position -----------------------
+
 
 	// Update player
 	game->getPlayer()->Update(deltaTime);
 
-	
+	// apply gravity
+	game->getPlayer()->ApplyForce(gravity);
 }
 
 void Scene1::Render() {
-	// render the player
-	// game->RenderPlayer(0.10f);
-
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	//render Button
-	//start->Render();
+
+	// render platform
+	Vec3 screenCoords;
+	float scale = 2.5f;
+	Vec3 pos = Vec3(12.5f, 4.0f, 0.0f);
+
+	plat1->Render(scale, pos);
 
 	// frame rate of animation
 	Uint32 ticks = SDL_GetTicks();
 	Uint32 sprite = (ticks / 100) % 4;
 
+	// cut animation, place it in world, resize it.
 	SDL_Rect srcrect = { sprite * 48, 0, 32, 64 };
-
-	Vec3 screenCoords = projectionMatrix * game->getPlayer()->getPos();
+	screenCoords = projectionMatrix * game->getPlayer()->getPos();
 	SDL_Rect dscrect = {screenCoords.x , screenCoords.y, 64, 128};
+
+	SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
+
 
 	SDL_RenderPresent(renderer);
 }

@@ -47,6 +47,9 @@ public:
 	void RenderPlayer(float scale = 1.0f);
 	SDL_Renderer* getRenderer();
 
+	// collision functions
+	void checkCollision(PlayerBody &player, FlatImage &object);
+
 	void Run();
     
 };

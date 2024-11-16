@@ -45,6 +45,9 @@
     <ClCompile Include="SceneStart.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FlatImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Body.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneStart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlatImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
