@@ -48,7 +48,7 @@ public:
 	SDL_Renderer* getRenderer();
 
 	// collision functions
-	void checkCollision(PlayerBody &player, FlatImage &object);
+	void checkCollision();
 
 	void Run();
     

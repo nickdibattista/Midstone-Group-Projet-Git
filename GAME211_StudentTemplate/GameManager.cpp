@@ -205,6 +205,6 @@ bool GameManager::ValidateCurrentScene()
 }
 
 // collision functions
-void GameManager::checkCollision(PlayerBody& player, FlatImage& object) {
+void GameManager::checkCollision() {
 
 }
