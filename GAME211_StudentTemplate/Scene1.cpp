@@ -9,7 +9,6 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	renderer = SDL_GetRenderer(window);
 	xAxis = 25.0f;
 	yAxis = 15.0f;
-	walkAnim = NULL;
 	gravity = Vec3(0.0f, -4.0f, 0.0f);
 }
 
@@ -27,19 +26,9 @@ bool Scene1::OnCreate() {
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
-	SDL_Surface* image;
-	SDL_Texture* texture;
+	Vec3 pos;
 
-	// Set animation to texture;
-	// TODO move this to the player class
-	/*
-	image = IMG_Load("Sprites/MikeyMountaintopWalk.png");
-	walkAnim = SDL_CreateTextureFromSurface(renderer, image);
-	SDL_FreeSurface(image);
-	*/
-	//TODO error checking
-
-	plat1 = new FlatImage("Sprites/Platform1.png", this);
+	plat1 = new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.5f, 4.0f, 0.0f));
 	if (!plat1->OnCreate()) {
 		std::cerr << "no Platform 1" << std::endl;
 		return false;
@@ -66,15 +55,24 @@ void Scene1::Update(const float deltaTime) {
 
 	Matrix4 ortho = MMath::orthographic(left, right, bottom, top, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
-	std::cout << left << " " << bottom << std::endl;
 	//  ------------- update screen position -----------------------
 
-
 	// Update player
-	game->getPlayer()->Update(deltaTime);
+
+	doCollisions();
 
 	// apply gravity
-	game->getPlayer()->ApplyForce(gravity);
+	if (game->getPlayer()->getGrounded() == false) {
+		game->getPlayer()->ApplyForce(gravity);
+		std::cout << "apply grav" << std::endl;
+	}
+
+	//std::cout << game->getPlayer()->getVel().y << std::endl;
+
+	game->getPlayer()->Update(deltaTime);
+
+	// print player pos
+	// std::cout << game->getPlayer()->getPos().x << " " << game->getPlayer()->getPos().y << std::endl;
 }
 
 void Scene1::Render() {
@@ -84,10 +82,8 @@ void Scene1::Render() {
 
 	// render platform
 	Vec3 screenCoords;
-	float scale = 2.5f;
-	Vec3 pos = Vec3(12.5f, 4.0f, 0.0f);
 
-	plat1->Render(scale, pos);
+	plat1->Render();
 
 	// render player
 	game->getPlayer()->Render(scale);
@@ -99,4 +95,25 @@ void Scene1::HandleEvents(const SDL_Event& event)
 {
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+}
+
+bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform) 
+{
+	bool collisionX;
+	bool collisionY;
+	float Yratio = yAxis / 600.0f;
+	float Xratio = xAxis / 1000.0f;
+	
+	collisionX = player.getPos().x + player.getPixels() * Xratio * 0.6f >= platform.GetPos().x - platform.GetImageSizeX() * Xratio * 0.6f &&
+		platform.GetPos().x + platform.GetImageSizeX() * Xratio * 0.6f >= player.getPos().x - player.getPixels() * Xratio * 0.6f;
+	collisionY = player.getPos().y + player.getPixels() * Yratio * 0.6f >= platform.GetPos().y - platform.GetImageSizeY() * Yratio * 0.6f &&
+		platform.GetPos().y + platform.GetImageSizeY() * Yratio * 0.6f >= player.getPos().y - player.getPixels() * Yratio * 0.6f;
+
+	return collisionX && collisionY;
+}
+
+void Scene1::doCollisions() {
+	if (checkCollision(*game->getPlayer(), *plat1)) {
+		
+	}
 }

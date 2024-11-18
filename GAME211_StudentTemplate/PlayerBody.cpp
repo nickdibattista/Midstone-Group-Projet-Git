@@ -21,6 +21,9 @@ bool PlayerBody::OnCreate()
 
 void PlayerBody::Render( float scale )
 {
+    int size = image->h;
+    int side = size * scale;
+
     // This is why we need game in the constructor, to get the renderer, etc.
     SDL_Renderer *renderer = game->getRenderer();
     Matrix4 projectionMatrix = game->getProjectionMatrix();
@@ -36,9 +39,10 @@ void PlayerBody::Render( float scale )
     Uint32 sprite = (ticks / 100) % 4;
 
     // cut animation, place it in world, resize it.
-    SDL_Rect srcrect = { sprite * 48, 0, 32, 64 };
+    // srcret is based on the image file. The one for the walking animation
+    SDL_Rect srcrect = { sprite * size, 0, size, size };
     screenCoords = projectionMatrix * getPos();
-    SDL_Rect dscrect = { screenCoords.x , screenCoords.y, 64, 128 };
+    SDL_Rect dscrect = { screenCoords.x - 0.5f * side, screenCoords.y - 0.5f * side, side, side};
 
     SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
 }
@@ -57,7 +61,13 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
             vel.x = 3.0f;
             break;
         case SDL_SCANCODE_SPACE:
-            // add jump force
+            if (grounded) 
+            {
+                ApplyForce(Vec3(0.0f, 8.0f, 0.0f));
+                grounded = false;
+                std::cout << "try to jump" << std::endl;
+            }
+            
             break;
         }
     }

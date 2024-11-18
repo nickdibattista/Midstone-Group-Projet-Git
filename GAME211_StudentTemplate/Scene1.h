@@ -18,9 +18,9 @@ private:
 	Matrix4 projectionMatrix;	// set in OnCreate()
     Matrix4     inverseProjection;	// set in OnCreate()
 	Button* start;
-	SDL_Texture* walkAnim;
 	Vec3 gravity;
 	FlatImage* plat1;
+	float scale = 2.5f;
 
 public:
 	// This constructor may be different from what you've seen before
@@ -38,6 +38,8 @@ public:
 	SDL_Window* getWindow() { return window; }
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
+	bool checkCollision(PlayerBody &player, FlatImage &platform);
+	void doCollisions();
 };
 
 #endif

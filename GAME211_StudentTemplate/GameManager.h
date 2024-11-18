@@ -26,6 +26,7 @@ private:
 
 	// This might be unfamiliar
     class PlayerBody *player;
+	Uint32 changeSceneEventType;
 
 	void handleEvents();
 	void LoadScene(int i);
@@ -47,8 +48,7 @@ public:
 	void RenderPlayer(float scale = 1.0f);
 	SDL_Renderer* getRenderer();
 
-	// collision functions
-	void checkCollision();
+	Uint32 getChangeScene() { return changeSceneEventType; };
 
 	void Run();
     

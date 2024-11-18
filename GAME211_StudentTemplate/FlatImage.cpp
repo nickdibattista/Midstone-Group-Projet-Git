@@ -1,10 +1,14 @@
 #include "FlatImage.h"
 #include "Vector.h"
 
-FlatImage::FlatImage(const string& fileName, Scene* owner_) {
+FlatImage::FlatImage(const string& fileName, Scene* owner_, float scale_, Vec3 pos_) {
 	scene = owner_;
 
 	image = IMG_Load(fileName.c_str());
+
+	pos = pos_;
+
+	scale = scale_;
 }
 
 
@@ -27,8 +31,8 @@ bool FlatImage::OnCreate() {
 	return true;
 }
 
-void FlatImage::Render(float scale, Vec3 pos) {
-	int		w, h;
+void FlatImage::Render() {
+	int w, h;
 	Vec3 screenCoords;
 
 	SDL_Renderer* renderer;
@@ -36,6 +40,7 @@ void FlatImage::Render(float scale, Vec3 pos) {
 	renderer = SDL_GetRenderer(window);
 
 	screenCoords = scene->getProjectionMatrix() * pos;
+
 	w = static_cast<int>(image->w * scale);
 	h = static_cast<int>(image->h * scale);
 

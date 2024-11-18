@@ -37,6 +37,8 @@ public:
 	virtual ~Body();
     virtual void Update(float deltaTime);
     virtual void ApplyForce(Vec3 force_);
+    virtual void setVel(Vec3 vel_) { vel = vel_; }
+    virtual void setAcc(Vec3 acc_) { accel = acc_; }
     virtual Vec3 getPos() { return pos; }
     virtual Vec3 getVel() { return vel; }
     virtual Vec3 getAccel() { return accel; }

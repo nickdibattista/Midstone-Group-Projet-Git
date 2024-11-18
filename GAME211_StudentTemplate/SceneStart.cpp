@@ -15,6 +15,8 @@ SceneStart::~SceneStart() {
 
 bool SceneStart::OnCreate() {
 	int w, h;
+	int scale;
+	Vec3 pos;
 	SDL_GetWindowSize(window, &w, &h);
 
 	Matrix4 ndc = MMath::viewportNDC(w, h);
@@ -25,28 +27,28 @@ bool SceneStart::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	// load logo
-	Logo = new FlatImage("Sprites/Logo.png", this);
+	Logo = new FlatImage("Sprites/Logo.png", this, scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
 	if (!Logo->OnCreate()) {
 		std::cerr << "no Logo" << std::endl;
 		return false;
 	}
 
 	// load background
-	Background = new FlatImage("Sprites/StartSceneBg.png", this);
+	Background = new FlatImage("Sprites/StartSceneBg.png", this, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
 	if (!Background->OnCreate()) {
 		std::cerr << "no start background" << std::endl;
 		return false;
 	}
 
 	// load start button texture
-	start = new Button("Sprites/StartButton.png", this);
+	start = new Button("Sprites/StartButton.png", this, pos = Vec3(12.5f, 6.0f, 0.0f), scale = 2.0f);
 	if (!start->OnCreate()) {
 		std::cerr << "no start button" << std::endl;
 		return false;
 	}
 
 	// load exit button texture
-	exit = new Button("Sprites/ExitButton.png", this);
+	exit = new Button("Sprites/ExitButton.png", this, pos = Vec3(12.5f, 4.0f, 0.0f), scale = 2.0f);
 	if (!exit->OnCreate()) {
 		std::cerr << "no exit button" << std::endl;
 		return false;
@@ -58,7 +60,25 @@ bool SceneStart::OnCreate() {
 void SceneStart::OnDestroy() {}
 
 void SceneStart::Update(const float deltaTime) {
+	// check buttons
 
+	if (start->GetActivated()) {
+		// do event
+		SDL_Event event;
+		SDL_memset(&event, 0, sizeof(event));
+		event.type = game->getChangeScene();
+		event.user.code = 1;
+		event.user.data1 = nullptr;
+		event.user.data2 = nullptr;
+		SDL_PushEvent(&event);
+	}
+
+	if (exit->GetActivated()) {
+		// do event
+		SDL_Event event;
+		event.type = SDL_QUIT;
+		SDL_PushEvent(&event);
+	}
 }
 
 void SceneStart::Render() {
@@ -69,20 +89,20 @@ void SceneStart::Render() {
 	Vec3 pos;
 
 	// display background
-	Background->Render(scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
+	Background->Render();
 	
 	// display logo
-	Logo->Render(scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
+	Logo->Render();
 
 	// display buttons
-	start->Render(scale = 2.0f, pos = Vec3(12.5f, 6.0f, 0.0f));
-	exit->Render(scale = 2.0f, pos = Vec3(12.5f, 4.0f, 0.0f));
+	start->Render();
+	exit->Render();
 
 	SDL_RenderPresent(renderer);
 }
 
 void SceneStart::HandleEvents(const SDL_Event& event)
 {
-
-
+	start->HandleEvents(event);
+	exit->HandleEvents(event);
 }
