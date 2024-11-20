@@ -40,6 +40,7 @@ public:
 	Matrix4 getInverseMatrix() { return inverseProjection; }
 	bool checkCollision(PlayerBody &player, FlatImage &platform);
 	void doCollisions();
+	void collisionResponse(PlayerBody *body,FlatImage *platform);
 };
 
 #endif

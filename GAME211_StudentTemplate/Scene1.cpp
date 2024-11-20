@@ -1,6 +1,7 @@
 #include "Scene1.h"
 #include <VMath.h>
 #include "Button.h"
+using namespace std;
 
 // See notes about this constructor in Scene1.h.
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
@@ -60,11 +61,12 @@ void Scene1::Update(const float deltaTime) {
 	// Update player
 
 	doCollisions();
-
+	collisionResponse(game->getPlayer(), plat1);
 	// apply gravity
 	if (game->getPlayer()->getGrounded() == false) {
 		game->getPlayer()->ApplyForce(gravity);
 		std::cout << "apply grav" << std::endl;
+
 	}
 
 	//std::cout << game->getPlayer()->getVel().y << std::endl;
@@ -109,11 +111,53 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 	collisionY = player.getPos().y + player.getPixels() * Yratio * 0.6f >= platform.GetPos().y - platform.GetImageSizeY() * Yratio * 0.6f &&
 		platform.GetPos().y + platform.GetImageSizeY() * Yratio * 0.6f >= player.getPos().y - player.getPixels() * Yratio * 0.6f;
 
-	return collisionX && collisionY;
+	return collisionX && collisionY; 
 }
 
 void Scene1::doCollisions() {
+//	if (checkCollision(*game->getPlayer(), *plat1)) {
+//		cout << "Collision Detected" << std::endl;
+//
+//		game->getPlayer()->setGrounded(true);
+//
+//		if (game->getPlayer()->getGrounded() == true) {
+//			
+//			std::cout << "grav gone" << std::endl;
+//
+//		}
+//		return;
+//	};
+}
+
+void Scene1::collisionResponse(PlayerBody* body, FlatImage* platform)
+{
 	if (checkCollision(*game->getPlayer(), *plat1)) {
-		
+		cout << "Collision Detected" << std::endl;
+	
+
+
+		game->getPlayer()->setGrounded(true);
+	
+
+		if (game->getPlayer()->getGrounded() == true) {
+
+			std::cout << "grav gone" << std::endl;
+			
+			/*Vec3 platformNormal(platform->GetPos().x, platform->GetPos().y, platform->GetPos().z);
+
+			if (VMath::dot(body->getVel(), platformNormal) > 0) {
+				return;
+			}
+
+			float magnitudeP = VMath::dot(-body->getVel(), platformNormal);
+			Vec3 p = magnitudeP * platformNormal;
+			body->setVel(body->getVel() += 2.0f * p); 
+			body->setAcc(Vec3());*/
+
+			//cout << body->getAccel();
+			//cout << body->getVel();
+			return;
+		}
 	}
+	return;
 }
