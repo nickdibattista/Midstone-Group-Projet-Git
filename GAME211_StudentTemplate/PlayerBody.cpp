@@ -55,10 +55,19 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
         switch (event.key.keysym.scancode)
         {
         case SDL_SCANCODE_A:
-            vel.x = -3.0f;
+            vel.x = -movSpeed;
             break;
         case SDL_SCANCODE_D:
-            vel.x = 3.0f;
+            vel.x = movSpeed;
+            break;
+        case SDL_SCANCODE_W:
+            vel.y = movSpeed;
+            break;
+        case SDL_SCANCODE_S:
+            vel.y = -movSpeed;
+            break;
+        case SDL_SCANCODE_R:
+            movSpeed = 10.0f;
             break;
         case SDL_SCANCODE_SPACE:
             if (grounded) 
@@ -82,6 +91,15 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
             break;
         case SDL_SCANCODE_D:
             vel.x = 0.0f;
+            break;
+        case SDL_SCANCODE_W:
+            vel.y = 0.0f;
+            break;
+        case SDL_SCANCODE_S:
+            vel.y = -0.0f;
+            break;
+        case SDL_SCANCODE_R:
+            movSpeed = 4.0f;
             break;
         }
     }

@@ -19,6 +19,7 @@ protected:
     SDL_Texture* walkAnim;
     float pixels = 16.0f;
     float grounded = false;
+    float movSpeed = 4.0f;
 
 public:
 

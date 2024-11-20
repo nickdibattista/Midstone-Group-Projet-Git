@@ -28,11 +28,44 @@ bool Scene1::OnCreate() {
 
 	Vec3 pos;
 
-	plat1 = new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.5f, 4.0f, 0.0f));
-	if (!plat1->OnCreate()) {
-		std::cerr << "no Platform 1" << std::endl;
-		return false;
+	// populate this array with all the platforms
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(24.0f, -1.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(28.0f, -5.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(36.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(42.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -10.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -13.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -16.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -19.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
+
+	// check everything in the array was done properly :p
+	for (FlatImage* platform : platformArray)
+	{
+		if (!platform->OnCreate()) {
+			std::cout << "no platform" << std::endl;
+			return false;
+		}
 	}
+
+	// this array will be generated procedurally based on the player's position
+	// fill that function on update if(player->pos().x + something > skyarray.top()->pos.x) add another one (?)
+	// otherwise just fill it in like the first one .-.
+	/*skyArray.push_back(new FlatImage("Sprites/SnowBackground.png", this, scale, pos = Vec3(12.0f, 8.0f, 0.0f)));
+	for (FlatImage* sky : skyArray)
+	{
+		if (!sky->OnCreate()) {
+			std::cout << "no platform" << std::endl;
+			return false;
+		}
+	}*/
+
+	// any other arrays for missellaneous decorations or clouds (clouds might have to go on a separate one
+	// so they can move)
 
 	return true;
 }
@@ -62,10 +95,10 @@ void Scene1::Update(const float deltaTime) {
 	doCollisions();
 
 	// apply gravity
-	if (game->getPlayer()->getGrounded() == false) {
+	/*if (game->getPlayer()->getGrounded() == false) {
 		game->getPlayer()->ApplyForce(gravity);
 		std::cout << "apply grav" << std::endl;
-	}
+	}*/
 
 	//std::cout << game->getPlayer()->getVel().y << std::endl;
 
@@ -83,7 +116,11 @@ void Scene1::Render() {
 	// render platform
 	Vec3 screenCoords;
 
-	plat1->Render();
+
+	for (FlatImage* platform : platformArray)
+	{
+		platform->Render();
+	}
 
 	// render player
 	game->getPlayer()->Render(scale);
@@ -103,9 +140,15 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 	bool collisionY;
 	float Yratio = yAxis / 600.0f;
 	float Xratio = xAxis / 1000.0f;
+
+	// TBD simplify Xratio and Y ratio with inverse projection (not really sure how to use it)
+	// also, might need some fine tunning
 	
-	collisionX = player.getPos().x + player.getPixels() * Xratio * 0.6f >= platform.GetPos().x - platform.GetImageSizeX() * Xratio * 0.6f &&
-		platform.GetPos().x + platform.GetImageSizeX() * Xratio * 0.6f >= player.getPos().x - player.getPixels() * Xratio * 0.6f;
+
+	// compare the borders on x for player and platform (player right side against platform left & the opposite)
+	collisionX = player.getPos().x + player.getPixels() * Xratio * 0.5f >= platform.GetPos().x - platform.GetImageSizeX() * Xratio * 0.5f &&
+		platform.GetPos().x + platform.GetImageSizeX() * Xratio * 0.5f >= player.getPos().x - player.getPixels() * Xratio * 0.5f;
+	// compare the borders on y for player and platform (player top side against platform bottom & the opposite)
 	collisionY = player.getPos().y + player.getPixels() * Yratio * 0.6f >= platform.GetPos().y - platform.GetImageSizeY() * Yratio * 0.6f &&
 		platform.GetPos().y + platform.GetImageSizeY() * Yratio * 0.6f >= player.getPos().y - player.getPixels() * Yratio * 0.6f;
 
@@ -113,7 +156,11 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 }
 
 void Scene1::doCollisions() {
-	if (checkCollision(*game->getPlayer(), *plat1)) {
-		
+	// check collisions with every platform
+	for (FlatImage* platform : platformArray)
+	{
+		if (checkCollision(*game->getPlayer(), *platform)) {
+			std::cout << "collision" << std::endl;
+		}
 	}
 }

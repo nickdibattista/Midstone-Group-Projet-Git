@@ -34,6 +34,7 @@ bool SceneStart::OnCreate() {
 	}
 
 	// load background
+	// TBD make a better background logo
 	Background = new FlatImage("Sprites/StartSceneBg.png", this, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
 	if (!Background->OnCreate()) {
 		std::cerr << "no start background" << std::endl;
@@ -41,6 +42,7 @@ bool SceneStart::OnCreate() {
 	}
 
 	// load start button texture
+	// also improve the button textures, they get lost with the bg ;-;
 	start = new Button("Sprites/StartButton.png", this, pos = Vec3(12.5f, 6.0f, 0.0f), scale = 2.0f);
 	if (!start->OnCreate()) {
 		std::cerr << "no start button" << std::endl;
@@ -103,6 +105,7 @@ void SceneStart::Render() {
 
 void SceneStart::HandleEvents(const SDL_Event& event)
 {
+	// can handle events return a bool? cuz it makes sense for the buttons to return a true when pressed
 	start->HandleEvents(event);
 	exit->HandleEvents(event);
 }
