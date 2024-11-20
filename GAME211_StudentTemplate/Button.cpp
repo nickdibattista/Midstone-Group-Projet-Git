@@ -1,12 +1,14 @@
 #include "Button.h"
 #include "Vector.h"
 
-Button::Button(const string &fileName, Vec3 position_, Scene* owner_) {
+Button::Button(const string& fileName, Scene* owner_, Vec3 pos_, float scale_) {
 	scene = owner_; 
-	image = IMG_Load(fileName.c_str()); 
-	square = { 0,0,0,0 };
-	texture = NULL;
-	position = position_;
+
+	image = IMG_Load(fileName.c_str());
+
+	pos = pos_;
+
+	scale = scale_;
 }
 
 
@@ -16,9 +18,6 @@ Button::~Button() {
 
 
 bool Button::OnCreate() {
-	int		w, h;
-	Vec3 screenCoords;
-
 	SDL_Renderer* renderer;
 	SDL_Window* window = scene->getWindow();
 	renderer = SDL_GetRenderer(window);
@@ -28,31 +27,28 @@ bool Button::OnCreate() {
 	if (image == nullptr) {
 		std::cerr << "Can't open image" << std::endl;
 	}
-
-	//Vec3 pos = Vec3(10.0f, 8.0f, 0.0f);
-	float scale = 1.0f;
-	SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
-	screenCoords = scene->getProjectionMatrix() * position;
-	w = static_cast<int>(image->w * scale);
-	h = static_cast<int>(image->h * scale);
-	square.x = static_cast<int>(screenCoords.x);
-	square.y = static_cast<int>(screenCoords.y);
-	square.w = w;
-	square.h = h;
 	
-	topLeft = position;
-	bottomRight = scene->getInverseMatrix() * Vec3(static_cast<float>(square.x + w), static_cast<float>(square.y + h), 1.0f);
-
 	return true;
 }
 
 void Button::Render() {
+	int		w, h;
+	Vec3 screenCoords;
 
 	SDL_Renderer* renderer;
 	SDL_Window* window = scene->getWindow();
 	renderer = SDL_GetRenderer(window);
 
+	screenCoords = scene->getProjectionMatrix() * pos;
+	w = static_cast<int>(image->w * scale);
+	h = static_cast<int>(image->h * scale);
 
+	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
+	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
+	square.w = w;
+	square.h = h;
+
+	SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 	
 
 	//con from rads to degrees
@@ -62,15 +58,50 @@ void Button::Render() {
 	SDL_RenderCopyEx(renderer, texture, nullptr, &square, orientationDegrees, nullptr, SDL_FLIP_NONE);
 }
 
-bool Button::clicked(Vec3 mousePos)
+void Button::HandleEvents(const SDL_Event& event)
 {
+    // player clicked on the button
+    if (event.type == SDL_MOUSEBUTTONDOWN)
+    {
+		if (event.button.button == SDL_BUTTON_LEFT) {
+			int x, y;
+			Uint32 buttons = SDL_GetMouseState(&x, &y);
 
-	//return true;
+			Vec3 screenCoords = scene->getProjectionMatrix() * pos;
 
-	return (
-		topLeft.x < mousePos.x && mousePos.x < bottomRight.x &&
-		bottomRight.y < mousePos.y < topLeft.y
-		);
+			bool withinX, withinY;
+
+			withinX = x < screenCoords.x + image->w * 0.5 * scale && x > screenCoords.x - image->w * 0.5 * scale;
+			withinY = y < screenCoords.y + image->h * 0.5 * scale && y > screenCoords.y - image->h * 0.5 * scale;
+
+			if (withinX && withinY) {
+				clicked = true;
+			}
+		}
+    }
+
+	if (event.type == SDL_MOUSEBUTTONUP)
+	{
+		if (event.button.button == SDL_BUTTON_LEFT) {
+			int x, y;
+			Uint32 buttons = SDL_GetMouseState(&x, &y);
+
+			Vec3 screenCoords = scene->getProjectionMatrix() * pos;
+
+			bool withinX, withinY;
+
+			// check the button press was within borders;
+			withinX = x < screenCoords.x + image->w * 0.5 * scale && x > screenCoords.x - image->w * 0.5 * scale;
+			withinY = y < screenCoords.y + image->h * 0.5 * scale && y > screenCoords.y - image->h * 0.5 * scale;
+
+			if (withinX && withinY) {
+				if (clicked == true) {
+					activated = true;
+				}
+			}
+			else {
+				clicked = false;
+			}
+		}
+	}
 }
-
-

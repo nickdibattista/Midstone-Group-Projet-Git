@@ -26,6 +26,7 @@ private:
 
 	// This might be unfamiliar
     class PlayerBody *player;
+	Uint32 changeSceneEventType;
 
 	void handleEvents();
 	void LoadScene(int i);
@@ -46,6 +47,8 @@ public:
     PlayerBody* getPlayer(){ return player; }
 	void RenderPlayer(float scale = 1.0f);
 	SDL_Renderer* getRenderer();
+
+	Uint32 getChangeScene() { return changeSceneEventType; };
 
 	void Run();
     

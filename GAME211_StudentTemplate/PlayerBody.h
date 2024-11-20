@@ -17,7 +17,11 @@ class PlayerBody : public Body
 protected:
     class GameManager* game;
     SDL_Texture* walkAnim;
+    float pixels = 16.0f;
+    float grounded = false;
+
 public:
+
     PlayerBody() : Body{}
     {
         game = nullptr;
@@ -53,8 +57,11 @@ public:
     void Render( float scale = 1.0f );
     void HandleEvents( const SDL_Event& event );
     void Update( float deltaTime );
+    void ApplyForce(Vec3 force);
     void setTexture( SDL_Texture* texture_ ) { texture = texture_; }
-    
+    float getPixels() { return pixels;  }
+    void setGrounded(bool grounded_) { grounded = grounded_; }
+    bool getGrounded() { return grounded; }
 };
 
-#endif /* PLAYERBODY_H */
+#endif // !PLAYERBODY_H 

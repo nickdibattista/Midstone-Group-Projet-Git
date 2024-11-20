@@ -19,16 +19,18 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect square; 
 	Scene* scene;
-	Vec3 position;
-	Vec3 topLeft;
-	Vec3 bottomRight;
+	Vec3 pos = Vec3();
+	float scale = 1.0f;
+	bool clicked = false;
+	bool activated = false;
 
 public:
-	Button(const string &fileName, Vec3 postion_, Scene* owner_);
+	Button(const string &fileName, Scene* owner_, Vec3 pos_, float scale_);
 	~Button();
 	bool OnCreate();
 	void Render();
-	bool clicked(Vec3 mousePos);
+	void HandleEvents(const SDL_Event& event);
+	bool GetActivated() { return activated; }
 };
 
 #endif // !BUTTON_H
