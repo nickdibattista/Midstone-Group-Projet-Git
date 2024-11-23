@@ -22,6 +22,7 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
+	inverseProjection = MMath::inverse(projectionMatrix);
 
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
@@ -42,6 +43,7 @@ bool Scene1::OnCreate() {
 	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
+
 
 	// check everything in the array was done properly :p
 	for (FlatImage* platform : platformArray)
@@ -94,11 +96,12 @@ void Scene1::Update(const float deltaTime) {
 
 	doCollisions();
 
-	// apply gravity
-	/*if (game->getPlayer()->getGrounded() == false) {
+	//apply gravity
+	if (game->getPlayer()->getGrounded() == false) {
 		game->getPlayer()->ApplyForce(gravity);
 		std::cout << "apply grav" << std::endl;
-	}*/
+	}
+	
 
 	//std::cout << game->getPlayer()->getVel().y << std::endl;
 
@@ -138,19 +141,19 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 {
 	bool collisionX;
 	bool collisionY;
-	float Yratio = yAxis / 600.0f;
-	float Xratio = xAxis / 1000.0f;
 
-	// TBD simplify Xratio and Y ratio with inverse projection (not really sure how to use it)
-	// also, might need some fine tunning
-	
+	// TODO find why the inverse projection isn't working
+
+	Vec3 playerSize = Vec3(player.getPixels(scale) * 25.0f / 1000.0f, player.getPixels(scale) * 15.0f / 600.0f, 0.0f);
+	Vec3 platformSize = Vec3(platform.GetImageSizeX() * 25.0f / 1000.0f, platform.GetImageSizeY() * 15.0f / 600.0f, 0.0f);
+
 
 	// compare the borders on x for player and platform (player right side against platform left & the opposite)
-	collisionX = player.getPos().x + player.getPixels() * Xratio * 0.5f >= platform.GetPos().x - platform.GetImageSizeX() * Xratio * 0.5f &&
-		platform.GetPos().x + platform.GetImageSizeX() * Xratio * 0.5f >= player.getPos().x - player.getPixels() * Xratio * 0.5f;
+	collisionX = player.getPos().x + playerSize.x * 0.5f >= platform.GetPos().x - platformSize.x * 0.5f &&
+		platform.GetPos().x + platformSize.x * 0.5f >= player.getPos().x - playerSize.x * 0.5f;
 	// compare the borders on y for player and platform (player top side against platform bottom & the opposite)
-	collisionY = player.getPos().y + player.getPixels() * Yratio * 0.6f >= platform.GetPos().y - platform.GetImageSizeY() * Yratio * 0.6f &&
-		platform.GetPos().y + platform.GetImageSizeY() * Yratio * 0.6f >= player.getPos().y - player.getPixels() * Yratio * 0.6f;
+	collisionY = player.getPos().y + playerSize.y * 0.5f >= platform.GetPos().y - platformSize.y * 0.5f &&
+		platform.GetPos().y + platformSize.y * 0.5f >= player.getPos().y - playerSize.y * 0.5f;
 
 	return collisionX && collisionY;
 }
@@ -159,8 +162,18 @@ void Scene1::doCollisions() {
 	// check collisions with every platform
 	for (FlatImage* platform : platformArray)
 	{
+
 		if (checkCollision(*game->getPlayer(), *platform)) {
 			std::cout << "collision" << std::endl;
+			// now that we have a collision we have to do position correction and act on the type of collision
+			
+			game->getPlayer()->setGrounded(true);
+			game->getPlayer()->setVel(Vec3(game->getPlayer()->getVel().x, 0.0f, 0.0f));
+			game->getPlayer()->setAcc(Vec3());
+			return;
+		}
+		else {
+			game->getPlayer()->setGrounded(false);
 		}
 	}
 }
