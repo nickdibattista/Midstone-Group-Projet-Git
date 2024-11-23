@@ -37,7 +37,7 @@ bool GameManager::OnCreate() {
 
     // select scene for specific assignment
 
-    currentScene = new Scene1(windowPtr->GetSDL_Window(), this);
+    currentScene = new SceneStart(windowPtr->GetSDL_Window(), this);
     
     // create player
     float mass = 1.0f;
@@ -71,7 +71,13 @@ bool GameManager::OnCreate() {
         OnDestroy();
         return false;
     }
-           
+       
+    changeSceneEventType = SDL_RegisterEvents(1);
+    if (changeSceneEventType == ((Uint32)-1)) {
+        OnDestroy();
+        return false;
+    }
+
 	return true;
 }
 
@@ -109,6 +115,12 @@ void GameManager::handleEvents()
         if (event.type == SDL_QUIT)
         {
             isRunning = false;
+        }
+        else if (event.type == changeSceneEventType)
+        {
+            // Load scene1
+            LoadScene(1);
+            break;
         }
         else if (event.type == SDL_KEYDOWN)
         {
@@ -181,6 +193,9 @@ void GameManager::LoadScene( int i )
         case 2:
             currentScene = new SceneStart(windowPtr->GetSDL_Window(), this);
             break;
+        case 3:
+            //credits scene?
+            break;
         default:
             currentScene = new Scene1( windowPtr->GetSDL_Window(), this );
             break;
@@ -202,9 +217,4 @@ bool GameManager::ValidateCurrentScene()
         return false;
     }
     return true;
-}
-
-// collision functions
-void GameManager::checkCollision() {
-
 }

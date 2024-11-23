@@ -19,12 +19,17 @@ private:
 	SDL_Texture* texture;
 	SDL_Rect square;
 	Scene* scene;
+	Vec3 pos;
+	float scale;
 
 public:
-	FlatImage(const string& fileName, Scene* owner_);
+	FlatImage(const string& fileName, Scene* owner_, float scale_ = 1.0f, Vec3 pos_ = Vec3());
 	~FlatImage();
 	bool OnCreate();
-	void Render(float scale = 1.0f, Vec3 pos = Vec3());
+	void Render();
+	Vec3 GetPos() { return pos; }
+	float GetImageSizeX() { return image->w * scale; }
+	float GetImageSizeY() {return image->h * scale;	}
 };
 
 #endif // !FLATIMAGE_H
