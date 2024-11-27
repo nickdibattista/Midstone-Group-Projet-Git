@@ -5,6 +5,8 @@
 #include <MMath.h>
 #include "Scene.h"
 #include "Button.h"
+#include "PlayerBody.h"
+
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -16,6 +18,8 @@ private:
 	Matrix4 projectionMatrix;	// set in OnCreate()
     Matrix4     inverseProjection;	// set in OnCreate()
 	Button *start;
+	
+
 
 public:
 	// This constructor may be different from what you've seen before

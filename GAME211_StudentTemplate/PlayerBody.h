@@ -12,10 +12,14 @@
 #include "Body.h"
 #include "GameManager.h"
 
+class MemoryPool;
+
 class PlayerBody : public Body
 {
 protected:
     class GameManager* game;
+    static MemoryPool* memory;
+    SDL_Renderer* renderer;
 
 public:
     PlayerBody() : Body{}
@@ -49,11 +53,16 @@ public:
     float force = 0.5;
     // use the base class versions of getters
 
+    // mem mngmt
+    void* operator new(size_t size);
+    void operator delete(void* ptr);
+    static void setMemoryPool(MemoryPool* pool);
+
     bool OnCreate();
     void Render( float scale = 1.0f );
     void HandleEvents( const SDL_Event& event );
     void Update( float deltaTime );
-    void setTexture( SDL_Texture* texture_ ) { texture = texture_; }
+    void setTexture( SDL_Texture* texture_ ) { this->texture = texture_; }
     
 };
 
