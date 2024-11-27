@@ -1,64 +1,87 @@
-//
-//  PlayerBody.cpp
-//  DemoAI
-//
-//  Created by Gail Harris on 2021-Dec-23.
-//
-
+// PlayerBody.cpp
 #include "PlayerBody.h"
+#include "MemoryPool.h"
+#include <iostream>
+
+// Initialize static member
+MemoryPool* PlayerBody::memory = nullptr;
+
+// Memory management implementations
+void* PlayerBody::operator new(size_t size) {
+    if (!memory) {
+        throw std::bad_alloc();
+    }
+    void* ptr = memory->allocate();
+    return ptr;
+}
+
+void PlayerBody::operator delete(void* ptr) {
+    if (!memory || !ptr) return;
+    memory->deallocate(ptr);
+}
+
+void PlayerBody::setMemoryPool(MemoryPool* pool) {
+    memory = pool;
+}
 
 bool PlayerBody::OnCreate()
 {
-    image = IMG_Load( "Pacman.png" );
-    SDL_Renderer *renderer = game->getRenderer();
-    texture = SDL_CreateTextureFromSurface( renderer, image );
+    // Load the image
+    image = IMG_Load("Pacman.png");
     if (image == nullptr) {
-        std::cerr << "Can't open the image" << std::endl;
+        std::cerr << "Failed to load Pacman.png: " << IMG_GetError() << std::endl;
         return false;
     }
+
+    // Create texture from surface
+    renderer = game->getRenderer();
+    if (renderer == nullptr) {
+        std::cerr << "Renderer is nullptr." << std::endl;
+        SDL_FreeSurface(image);
+        return false;
+    }
+
+    texture = SDL_CreateTextureFromSurface(renderer, image);
+    if (texture == nullptr) {
+        std::cerr << "Failed to create texture from Pacman.png: " << SDL_GetError() << std::endl;
+        SDL_FreeSurface(image);
+        return false;
+    }
+
     return true;
 }
 
-void PlayerBody::Render( float scale )
+void PlayerBody::Render(float scale)
 {
-    // This is why we need game in the constructor, to get the renderer, etc.
-    SDL_Renderer *renderer = game->getRenderer();
-    Matrix4 projectionMatrix = game->getProjectionMatrix();
+    if (!texture) return;
 
-    // square represents the position and dimensions for where to draw the image
-    SDL_Rect square;
-    Vec3 screenCoords;
-    float    w, h;
+    // Convert the position from game coords to screen coords.
+    Vec3 screenCoords = game->getProjectionMatrix() * pos;
 
-    // convert the position from game coords to screen coords.
-    screenCoords = projectionMatrix * pos;
+    // Scale the image
+    float w = image->w * scale;
+    float h = image->h * scale;
 
-    // Scale the image, in case the .png file is too big or small
-    w = image->w * scale;
-    h = image->h * scale;
+    // Define the rectangle for rendering
+    SDL_Rect destRect;
+    destRect.x = static_cast<int>(screenCoords.x - 0.5f * w);
+    destRect.y = static_cast<int>(screenCoords.y - 0.5f * h);
+    destRect.w = static_cast<int>(w);
+    destRect.h = static_cast<int>(h);
 
-    // The square's x and y values represent the top left corner of 
-    // where SDL will draw the .png image.
-    // The 0.5f * w/h offset is to place the .png so that pos represents the center
-    // (Note the y axis for screen coords points downward, hence subtraction!!!!)
-    square.x = static_cast<int>(screenCoords.x - 0.5f * w);
-    square.y = static_cast<int>(screenCoords.y - 0.5f * h);
-    square.w = static_cast<int>(w);
-    square.h = static_cast<int>(h);
+    // Convert orientation from radians to degrees
+    float orientationDegrees = orientation * 180.0f / M_PI;
 
-    // Convert character orientation from radians to degrees.
-    float orientationDegrees = orientation * 180.0f / M_PI ;
-
-    SDL_RenderCopyEx( renderer, texture, nullptr, &square,
-        orientationDegrees, nullptr, SDL_FLIP_NONE );
+    // Render the texture with rotation
+    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect,
+        orientationDegrees, nullptr, SDL_FLIP_NONE);
 }
 
-void PlayerBody::HandleEvents( const SDL_Event& event )
-{ 
+void PlayerBody::HandleEvents(const SDL_Event& event)
+{
     float maxSpeed = 2.0f;
-    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) 
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0)
     {
-       
         switch (event.key.keysym.scancode)
         {
         case SDL_SCANCODE_W:
@@ -69,16 +92,15 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
             break;
         case SDL_SCANCODE_S:
             vel.y = maxSpeed * -1.0f;
-            break;            
+            break;
         case SDL_SCANCODE_D:
             vel.x = maxSpeed * 1.0f;
             break;
         }
     }
-    //when key released, stop moving
-    if (event.type == SDL_KEYUP) //&& event.key.repeat == 0
+    // When key released, stop moving
+    if (event.type == SDL_KEYUP)
     {
-        float maxSpeed = 1.0f;
         switch (event.key.keysym.scancode)
         {
         case SDL_SCANCODE_W:
@@ -96,20 +118,21 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
         }
     }
 
-    //normalize velocity
-
+    // Normalize velocity
     if (VMath::mag(vel) > VERY_SMALL)
     {
         vel = VMath::normalize(vel) * maxSpeed;
     }
 }
 
-void PlayerBody::Update( float deltaTime )
+void PlayerBody::Update(float deltaTime)
 {
-    // Update position, call Update from base class
-    // Note that would update velocity too, and rotation motion
-    Body::Update( deltaTime );
-    Body::ApplyForce(Vec3(0.0f, -force, 0.0f));
-    force = force + 0.1;
-}
+    // Update position by calling the base class update
+    Body::Update(deltaTime);
 
+    // Apply a force (gravity-like effect)
+    Body::ApplyForce(Vec3(0.0f, -force, 0.0f));
+
+    // Increment force (could be part of some effect)
+    force += 0.1f;
+}

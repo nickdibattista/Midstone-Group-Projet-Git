@@ -2,6 +2,9 @@
 #include <VMath.h>
 #include "Button.h"
 
+
+
+
 // See notes about this constructor in Scene1.h.
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
@@ -12,11 +15,15 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 }
 
 Scene1::~Scene1(){
+	if (start) {
+		delete start;
+		start = nullptr;
+	}
 }
 
 bool Scene1::OnCreate() {
 	int w, h;
-	SDL_GetWindowSize(window,&w,&h);
+	SDL_GetWindowSize(window, &w, &h);
 
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
@@ -24,42 +31,54 @@ bool Scene1::OnCreate() {
 	inverseProjection = MMath::inverse(projectionMatrix);
 
 	/// Turn on the SDL imaging subsystem
-	IMG_Init(IMG_INIT_PNG);
+	if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+		std::cerr << "Failed to initialize SDL_image: " << IMG_GetError() << std::endl;
+		return false;
+	}
 
-	// Set player image to PacMan
-
-	SDL_Surface* image;
-	SDL_Texture* texture;
-
-	image = IMG_Load("pacman.png");
-	texture = SDL_CreateTextureFromSurface(renderer, image);
-	game->getPlayer()->setImage(image);
-	game->getPlayer()->setTexture(texture);
-
+	// Initialize Button
 	start = new Button("Clyde.png", Vec3(10.0f, 8.0f, 0.0f), this);
 	if (!start->OnCreate()) {
+		std::cerr << "Failed to create Button instance." << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-void Scene1::OnDestroy() {}
+
+void Scene1::OnDestroy() {
+	// Report Memory Usage if needed
+	// MemoryPool is managed by GameManager
+
+	// Clean up Button
+	if (start) {
+		delete start;
+		start = nullptr;
+	}
+
+	// Quit SDL_image
+	IMG_Quit();
+}
 
 void Scene1::Update(const float deltaTime) {
 
 	// Update player
-	game->getPlayer()->Update(deltaTime);
+	if (game->getPlayer()) {
+		game->getPlayer()->Update(deltaTime);
+	}
 }
 
 void Scene1::Render() {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Opaque black background
 	SDL_RenderClear(renderer);
 
-	//render Button
-	start->Render();
+	// Render Button
+	if (start) {
+		start->Render();
+	}
 
-	// render the player
+	// Render the player
 	game->RenderPlayer(0.10f);
 
 	SDL_RenderPresent(renderer);
@@ -67,8 +86,10 @@ void Scene1::Render() {
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
-	// send events to player as needed
-	game->getPlayer()->HandleEvents(event);
+	// Send events to player as needed
+	if (game->getPlayer()) {
+		game->getPlayer()->HandleEvents(event);
+	}
 
 	Vec3 mousePos = getMousePosition();
 

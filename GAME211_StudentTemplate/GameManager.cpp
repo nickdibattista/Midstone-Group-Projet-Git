@@ -1,6 +1,8 @@
 #include "GameManager.h"
 #include "Scene1.h"
 
+MemoryPool* GameManager::npcMemoryPool = nullptr;
+
 GameManager::GameManager() {
 	windowPtr = nullptr;
 	timer = nullptr;
@@ -10,35 +12,56 @@ GameManager::GameManager() {
 }
 
 bool GameManager::OnCreate() {
-    // My display is 1920 x 1080 but the following seems to work best to fill the screen.
-    //const int SCREEN_WIDTH = 1540;
-    //const int SCREEN_HEIGHT = 860;
-
-    // Use 1000x600 for less than full screen
+    // Define screen dimensions
     const int SCREEN_WIDTH = 1000;
     const int SCREEN_HEIGHT = 600;
 
+    // Initialize Window
     windowPtr = new Window(SCREEN_WIDTH, SCREEN_HEIGHT);
-	if (windowPtr == nullptr) {
-		OnDestroy();
-		return false;
-	}
-	if (windowPtr->OnCreate() == false) {
-		OnDestroy();
-		return false;
-	}
+    if (windowPtr == nullptr) {
+        std::cerr << "Failed to create Window instance." << std::endl;
+        OnDestroy();
+        return false;
+    }
+    if (windowPtr->OnCreate() == false) {
+        std::cerr << "Window::OnCreate() failed." << std::endl;
+        OnDestroy();
+        return false;
+    }
 
-	timer = new Timer();
-	if (timer == nullptr) {
-		OnDestroy();
-		return false;
-	}
+    // Initialize Timer
+    timer = new Timer();
+    if (timer == nullptr) {
+        std::cerr << "Failed to create Timer instance." << std::endl;
+        OnDestroy();
+        return false;
+    }
 
-    // select scene for specific assignment
+    // Initialize MemoryPool
+    npcMemoryPool = new MemoryPool(sizeof(PlayerBody), 100); // Pool size set to 100
+    if (npcMemoryPool == nullptr) {
+        std::cerr << "Failed to create MemoryPool instance." << std::endl;
+        OnDestroy();
+        return false;
+    }
+    PlayerBody::setMemoryPool(npcMemoryPool);
 
+    // Create Scene1 Instance
     currentScene = new Scene1(windowPtr->GetSDL_Window(), this);
-    
-    // create player
+    if (currentScene == nullptr) {
+        std::cerr << "Failed to create Scene1 instance." << std::endl;
+        OnDestroy();
+        return false;
+    }
+
+    // Initialize Scene1
+    if (!ValidateCurrentScene()) {
+        std::cerr << "Scene1 validation failed." << std::endl;
+        OnDestroy();
+        return false;
+    }
+
+    // Create PlayerBody instance
     float mass = 1.0f;
     float radius = 0.5f;
     float orientation = 0.0f;
@@ -48,30 +71,38 @@ bool GameManager::OnCreate() {
     Vec3 velocity(0.0f, 0.0f, 0.0f);
     Vec3 acceleration(0.0f, 0.0f, 0.0f);
 
-    player = new PlayerBody
-    (
-        position,
-        velocity,
-        acceleration,
-        mass,
-        radius,
-        orientation,
-        rotation,
-        angular,
-        this
-    );
-    if ( player->OnCreate() == false ) {
+    try {
+        player = new PlayerBody(
+            position,
+            velocity,
+            acceleration,
+            mass,
+            radius,
+            orientation,
+            rotation,
+            angular,
+            this
+        );
+    }
+    catch (const std::bad_alloc& e) {
+        std::cerr << "Memory allocation for PlayerBody failed: " << e.what() << std::endl;
         OnDestroy();
         return false;
     }
 
-    // need to create Player before validating scene
-    if (!ValidateCurrentScene()) {
+    if (player == nullptr) {
+        std::cerr << "Failed to create PlayerBody instance." << std::endl;
         OnDestroy();
         return false;
     }
-           
-	return true;
+
+    if (player->OnCreate() == false) {
+        std::cerr << "PlayerBody::OnCreate() failed." << std::endl;
+        OnDestroy();
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -135,10 +166,30 @@ void GameManager::handleEvents()
 
 GameManager::~GameManager() {}
 
-void GameManager::OnDestroy(){
-	if (windowPtr) delete windowPtr;
-	if (timer) delete timer;
-	if (currentScene) delete currentScene;
+void GameManager::OnDestroy() {
+
+    npcMemoryPool->reportMemoryUsage();
+    if (player) {
+        delete player;
+        player = nullptr;
+    }
+    if (currentScene) {
+        currentScene->OnDestroy();
+        delete currentScene;
+        currentScene = nullptr;
+    }
+    if (timer) {
+        delete timer;
+        timer = nullptr;
+    }
+    if (npcMemoryPool) {
+        delete npcMemoryPool;
+        npcMemoryPool = nullptr;
+    }
+    if (windowPtr) {
+        delete windowPtr;
+        windowPtr = nullptr;
+    }
 }
 
 // This might be unfamiliar
@@ -169,8 +220,16 @@ void GameManager::RenderPlayer(float scale)
 void GameManager::LoadScene( int i )
 {
     // cleanup of current scene before loading another one
-    currentScene->OnDestroy();
-    delete currentScene;
+    if (currentScene) {
+        currentScene->OnDestroy();
+        delete currentScene;
+        currentScene = nullptr;
+    }
+
+    if (player) {
+        delete player;
+        player = nullptr;
+    }
 
     switch ( i )
     {
@@ -185,6 +244,7 @@ void GameManager::LoadScene( int i )
     // using ValidateCurrentScene() to safely run OnCreate
     if (!ValidateCurrentScene())
     {
+        std::cerr << "Failed to validate the new scene." << std::endl;
         isRunning = false;
     }
 }
@@ -192,9 +252,11 @@ void GameManager::LoadScene( int i )
 bool GameManager::ValidateCurrentScene()
 {
     if (currentScene == nullptr) {
+        std::cerr << "Current scene is nullptr." << std::endl;
         return false;
     }
     if (currentScene->OnCreate() == false) {
+        std::cerr << "Scene1::OnCreate() failed." << std::endl;
         return false;
     }
     return true;
