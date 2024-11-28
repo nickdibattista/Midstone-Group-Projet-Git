@@ -10,13 +10,14 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	xAxis = 25.0f;
 	yAxis = 15.0f;
 	gravity = Vec3(0.0f, -4.0f, 0.0f);
-}
+	}
 
 Scene1::~Scene1(){
 }
 
 bool Scene1::OnCreate() {
 	int w, h;
+
 	SDL_GetWindowSize(window,&w,&h);
 
 	Matrix4 ndc = MMath::viewportNDC(w, h);
@@ -27,8 +28,15 @@ bool Scene1::OnCreate() {
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
-	Vec3 pos;
+	//Load background
+	SDL_Surface* backgroundSurface = IMG_Load("Sprites/SnowBackground.png");
+		if (!backgroundSurface) {
+		std::cout << "Unable to load Image! SDL_image ERROR \n";}
+	sceneAssets.backgroundTexture = SDL_CreateTextureFromSurface(renderer, backgroundSurface);
+	SDL_FreeSurface(backgroundSurface);
 
+
+	Vec3 pos;
 	// populate this array with all the platforms
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
@@ -112,9 +120,16 @@ void Scene1::Update(const float deltaTime) {
 }
 
 void Scene1::Render() {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
+	// Render Background
+	if (sceneAssets.backgroundTexture) {
+		SDL_RenderCopy(renderer, sceneAssets.backgroundTexture, NULL, NULL);
+	}
+	else {
+		std::cout << "background texture is null!\n";
+	}
 
 	// render platform
 	Vec3 screenCoords;

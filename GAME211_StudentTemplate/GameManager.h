@@ -27,6 +27,7 @@ private:
 	// This might be unfamiliar
     class PlayerBody *player;
 	Uint32 changeSceneEventType;
+	Uint32 winSceneEventType;
 
 	void handleEvents();
 	void LoadScene(int i);

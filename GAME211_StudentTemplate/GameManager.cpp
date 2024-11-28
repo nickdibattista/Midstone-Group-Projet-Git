@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include "Scene1.h"
 #include "SceneStart.h"
+#include "SceneWinScreen.h"
 
 GameManager::GameManager() {
 	windowPtr = nullptr;
@@ -78,6 +79,13 @@ bool GameManager::OnCreate() {
         return false;
     }
 
+    winSceneEventType = SDL_RegisterEvents(1);
+    if (winSceneEventType == ((Uint32)-1)) {
+        OnDestroy();
+        return false;
+    }
+
+
 	return true;
 }
 
@@ -122,6 +130,12 @@ void GameManager::handleEvents()
             LoadScene(1);
             break;
         }
+        else if (event.type == winSceneEventType)
+        {
+            // Load scene1
+            LoadScene(3);
+            break;
+        }
         else if (event.type == SDL_KEYDOWN)
         {
             switch (event.key.keysym.scancode)
@@ -137,6 +151,9 @@ void GameManager::handleEvents()
                 break;
             case SDL_SCANCODE_1:
                 LoadScene(1);
+                break;
+            case SDL_SCANCODE_2:
+                LoadScene(3);
                 break;
             default:
                 break;
@@ -194,7 +211,7 @@ void GameManager::LoadScene( int i )
             currentScene = new SceneStart(windowPtr->GetSDL_Window(), this);
             break;
         case 3:
-            //credits scene?
+            currentScene = new SceneWinScreen(windowPtr->GetSDL_Window(), this);
             break;
         default:
             currentScene = new Scene1( windowPtr->GetSDL_Window(), this );

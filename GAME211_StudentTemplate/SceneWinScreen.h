@@ -1,50 +1,42 @@
-#ifndef SCENE1_H
-#define SCENE1_H
+#ifndef SCENEWINSCREEN_H
+#define SCENEWINSCREEN_H
 
 
 #include <MMath.h>
 #include "Scene.h"
 #include "Button.h"
-#include "TileMap.h"
 #include "FlatImage.h"
-#include <vector>
 
 using namespace MATH;
-class Scene1 : public Scene {
+class SceneWinScreen : public Scene {
 private:
 	float xAxis;	// scene width, in game coords, set in constructor
 	float yAxis;	// scene height, in game coords, set in constructor
 	SDL_Window* window;		// an SDL window with a SDL renderer
 	SDL_Renderer* renderer;	// the renderer associated with SDL window
 	Matrix4 projectionMatrix;	// set in OnCreate()
-    Matrix4     inverseProjection;	// set in OnCreate()
-	Button* start;
-	Vec3 gravity;
-	std::vector<FlatImage*> platformArray; //an array of every platform
-	std::vector<FlatImage*> skyArray; //an array for the sky
-	float scale = 2.5f;
+	Matrix4 inverseProjection;	// set in OnCreate()
+	FlatImage* Logo; //set in OnCreate()
+	FlatImage* Background; //set in OnCreate()
+	Button* menuReturn; //set in OnCreate()
+	Button* exit; //set in OnCreate()
 
 public:
 	// This constructor may be different from what you've seen before
 	// Notice the second parameter, and look in GameManager.cpp
 	// to see how this constructor is called.
-	struct SceneAssets {SDL_Texture* backgroundTexture = nullptr;};
-	SceneAssets sceneAssets;
-	Scene1(SDL_Window* sdlWindow, GameManager* game_);
-	~Scene1();
+	SceneWinScreen(SDL_Window* sdlWindow, GameManager* game_);
+	~SceneWinScreen();
 	bool OnCreate();
 	void OnDestroy();
 	void Update(const float time);
 	void Render();
-    void HandleEvents(const SDL_Event &event);
+	void HandleEvents(const SDL_Event& event);
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }
 	SDL_Window* getWindow() { return window; }
-    Matrix4 getProjectionMatrix() { return projectionMatrix; }
+	Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
-	bool checkCollision(PlayerBody &player, FlatImage &platform);
-	void doCollisions();
-	void collisionResponse(PlayerBody *body,FlatImage *platform);
 };
 
 #endif

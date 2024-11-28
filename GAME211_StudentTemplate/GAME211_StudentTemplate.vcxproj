@@ -28,6 +28,7 @@
     <ClCompile Include="Scene0.cpp" />
     <ClCompile Include="Scene1.cpp" />
     <ClCompile Include="SceneStart.cpp" />
+    <ClCompile Include="SceneWinScreen.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="Scene0.h" />
     <ClInclude Include="Scene1.h" />
     <ClInclude Include="SceneStart.h" />
+    <ClInclude Include="SceneWinScreen.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
