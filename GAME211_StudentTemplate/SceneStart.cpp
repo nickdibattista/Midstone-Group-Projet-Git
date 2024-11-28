@@ -34,6 +34,7 @@ bool SceneStart::OnCreate() {
 	}
 
 	// load background
+	// TODO make a better background logo
 	Background = new FlatImage("Sprites/StartSceneBg.png", this, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
 	if (!Background->OnCreate()) {
 		std::cerr << "no start background" << std::endl;
@@ -41,6 +42,7 @@ bool SceneStart::OnCreate() {
 	}
 
 	// load start button texture
+	// TODO improve the button textures, they get lost with the bg ;-;
 	start = new Button("Sprites/StartButton.png", this, pos = Vec3(12.5f, 6.0f, 0.0f), scale = 2.0f);
 	if (!start->OnCreate()) {
 		std::cerr << "no start button" << std::endl;

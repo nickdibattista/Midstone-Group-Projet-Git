@@ -7,6 +7,7 @@
 #include "Button.h"
 #include "TileMap.h"
 #include "FlatImage.h"
+#include <vector>
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -19,7 +20,8 @@ private:
     Matrix4     inverseProjection;	// set in OnCreate()
 	Button* start;
 	Vec3 gravity;
-	FlatImage* plat1;
+	std::vector<FlatImage*> platformArray; //an array of every platform
+	std::vector<FlatImage*> skyArray; //an array for the sky
 	float scale = 2.5f;
 
 public:

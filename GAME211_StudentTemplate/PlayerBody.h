@@ -19,6 +19,7 @@ protected:
     SDL_Texture* walkAnim;
     float pixels = 16.0f;
     float grounded = false;
+    float movSpeed = 4.0f;
 
 public:
 
@@ -59,7 +60,7 @@ public:
     void Update( float deltaTime );
     void ApplyForce(Vec3 force);
     void setTexture( SDL_Texture* texture_ ) { texture = texture_; }
-    float getPixels() { return pixels;  }
+    float getPixels(float scale) { return pixels * scale;  }
     void setGrounded(bool grounded_) { grounded = grounded_; }
     bool getGrounded() { return grounded; }
 };

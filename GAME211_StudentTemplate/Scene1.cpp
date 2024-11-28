@@ -1,7 +1,6 @@
 #include "Scene1.h"
 #include <VMath.h>
 #include "Button.h"
-using namespace std;
 
 // See notes about this constructor in Scene1.h.
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
@@ -23,17 +22,52 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
+	inverseProjection = MMath::inverse(projectionMatrix);
 
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
 	Vec3 pos;
 
-	plat1 = new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.5f, 4.0f, 0.0f));
-	if (!plat1->OnCreate()) {
-		std::cerr << "no Platform 1" << std::endl;
-		return false;
+	// populate this array with all the platforms
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(24.0f, -1.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(28.0f, -5.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(36.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(42.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -10.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -13.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -16.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -19.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
+
+
+	// check everything in the array was done properly :p
+	for (FlatImage* platform : platformArray)
+	{
+		if (!platform->OnCreate()) {
+			std::cout << "no platform" << std::endl;
+			return false;
+		}
 	}
+
+	// this array will be generated procedurally based on the player's position
+	// fill that function on update if(player->pos().x + something > skyarray.top()->pos.x) add another one (?)
+	// otherwise just fill it in like the first one .-.
+	/*skyArray.push_back(new FlatImage("Sprites/SnowBackground.png", this, scale, pos = Vec3(12.0f, 8.0f, 0.0f)));
+	for (FlatImage* sky : skyArray)
+	{
+		if (!sky->OnCreate()) {
+			std::cout << "no platform" << std::endl;
+			return false;
+		}
+	}*/
+
+	// any other arrays for missellaneous decorations or clouds (clouds might have to go on a separate one
+	// so they can move)
 
 	return true;
 }
@@ -61,13 +95,13 @@ void Scene1::Update(const float deltaTime) {
 	// Update player
 
 	doCollisions();
-	collisionResponse(game->getPlayer(), plat1);
-	// apply gravity
+
+	//apply gravity
 	if (game->getPlayer()->getGrounded() == false) {
 		game->getPlayer()->ApplyForce(gravity);
 		std::cout << "apply grav" << std::endl;
-
 	}
+	
 
 	//std::cout << game->getPlayer()->getVel().y << std::endl;
 
@@ -85,7 +119,11 @@ void Scene1::Render() {
 	// render platform
 	Vec3 screenCoords;
 
-	plat1->Render();
+
+	for (FlatImage* platform : platformArray)
+	{
+		platform->Render();
+	}
 
 	// render player
 	game->getPlayer()->Render(scale);
@@ -103,61 +141,39 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 {
 	bool collisionX;
 	bool collisionY;
-	float Yratio = yAxis / 600.0f;
-	float Xratio = xAxis / 1000.0f;
-	
-	collisionX = player.getPos().x + player.getPixels() * Xratio * 0.6f >= platform.GetPos().x - platform.GetImageSizeX() * Xratio * 0.6f &&
-		platform.GetPos().x + platform.GetImageSizeX() * Xratio * 0.6f >= player.getPos().x - player.getPixels() * Xratio * 0.6f;
-	collisionY = player.getPos().y + player.getPixels() * Yratio * 0.6f >= platform.GetPos().y - platform.GetImageSizeY() * Yratio * 0.6f &&
-		platform.GetPos().y + platform.GetImageSizeY() * Yratio * 0.6f >= player.getPos().y - player.getPixels() * Yratio * 0.6f;
 
-	return collisionX && collisionY; 
+	// TODO find why the inverse projection isn't working
+
+	Vec3 playerSize = Vec3(player.getPixels(scale) * 25.0f / 1000.0f, player.getPixels(scale) * 15.0f / 600.0f, 0.0f);
+	Vec3 platformSize = Vec3(platform.GetImageSizeX() * 25.0f / 1000.0f, platform.GetImageSizeY() * 15.0f / 600.0f, 0.0f);
+
+
+	// compare the borders on x for player and platform (player right side against platform left & the opposite)
+	collisionX = player.getPos().x + playerSize.x * 0.5f >= platform.GetPos().x - platformSize.x * 0.5f &&
+		platform.GetPos().x + platformSize.x * 0.5f >= player.getPos().x - playerSize.x * 0.5f;
+	// compare the borders on y for player and platform (player top side against platform bottom & the opposite)
+	collisionY = player.getPos().y + playerSize.y * 0.5f >= platform.GetPos().y - platformSize.y * 0.5f &&
+		platform.GetPos().y + platformSize.y * 0.5f >= player.getPos().y - playerSize.y * 0.5f;
+
+	return collisionX && collisionY;
 }
 
 void Scene1::doCollisions() {
-//	if (checkCollision(*game->getPlayer(), *plat1)) {
-//		cout << "Collision Detected" << std::endl;
-//
-//		game->getPlayer()->setGrounded(true);
-//
-//		if (game->getPlayer()->getGrounded() == true) {
-//			
-//			std::cout << "grav gone" << std::endl;
-//
-//		}
-//		return;
-//	};
-}
+	// check collisions with every platform
+	for (FlatImage* platform : platformArray)
+	{
 
-void Scene1::collisionResponse(PlayerBody* body, FlatImage* platform)
-{
-	if (checkCollision(*game->getPlayer(), *plat1)) {
-		cout << "Collision Detected" << std::endl;
-	
-
-
-		game->getPlayer()->setGrounded(true);
-	
-
-		if (game->getPlayer()->getGrounded() == true) {
-
-			std::cout << "grav gone" << std::endl;
+		if (checkCollision(*game->getPlayer(), *platform)) {
+			std::cout << "collision" << std::endl;
+			// now that we have a collision we have to do position correction and act on the type of collision
 			
-			/*Vec3 platformNormal(platform->GetPos().x, platform->GetPos().y, platform->GetPos().z);
-
-			if (VMath::dot(body->getVel(), platformNormal) > 0) {
-				return;
-			}
-
-			float magnitudeP = VMath::dot(-body->getVel(), platformNormal);
-			Vec3 p = magnitudeP * platformNormal;
-			body->setVel(body->getVel() += 2.0f * p); 
-			body->setAcc(Vec3());*/
-
-			//cout << body->getAccel();
-			//cout << body->getVel();
+			game->getPlayer()->setGrounded(true);
+			game->getPlayer()->setVel(Vec3(game->getPlayer()->getVel().x, 0.0f, 0.0f));
+			game->getPlayer()->setAcc(Vec3());
 			return;
 		}
+		else {
+			game->getPlayer()->setGrounded(false);
+		}
 	}
-	return;
 }
