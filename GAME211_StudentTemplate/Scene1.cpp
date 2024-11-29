@@ -16,20 +16,47 @@ Scene1::~Scene1(){
 }
 
 bool Scene1::OnCreate() {
+	//In-Game Background Music
+	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+		std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
+		return -1;
+	}
+
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << "\n";
+		return -1;
+	}
+	Mix_Music* backgroundMusic = Mix_LoadMUS("Sounds/backgroundMusic.mp3");
+	if (!backgroundMusic) {
+		std::cout << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << "\n";
+		return -1;
+	}
+	Mix_PlayMusic(backgroundMusic, -1);  // -1 means loop indefinitely
+
+
 	int w, h;
 	SDL_GetWindowSize(window,&w,&h);
-
+	//Viewport
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
 	inverseProjection = MMath::inverse(projectionMatrix);
 
-	/// Turn on the SDL imaging subsystem
+	// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
-	Vec3 pos;
+	//Load Background Image
+	SDL_Surface* backgroundSurface = IMG_Load("Sprites/SnowBackground.png");
+	if (!backgroundSurface) {
+		std::cout << "Failed to load background image! SDL_image Error: " << IMG_GetError << "\n";
+		return -1;
+	}
+	sceneAssets.backgroundTexture = SDL_CreateTextureFromSurface(renderer, backgroundSurface);
+	SDL_FreeSurface(backgroundSurface);
+
 
 	// populate this array with all the platforms
+	Vec3 pos;
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(24.0f, -1.0f, 0.0f)));
@@ -43,7 +70,28 @@ bool Scene1::OnCreate() {
 	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
-
+	//Nick's Starting point for adding platforms
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(70.0f, -35.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(75.0f, -34.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(79.0f, -34.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(83.0f, -34.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(88.0f, -38.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(91.0f, -37.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(94.0f, -38.0f, 0.0f)));
+	//Increase Difficulty
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(100.0f, -40.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(101.0f, -45.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(102.0f, -50.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(106.0f, -40.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(106.0f, -44.0f, 0.0f)));
+	//Stairs Jump
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(108.0f, -50.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(112.0f, -49.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(116.0f, -48.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(121.0f, -51.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(129.0f, -55.0f, 0.0f)));
+	//Ending Platform
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(137.0f, -55.0f, 0.0f)));
 
 	// check everything in the array was done properly :p
 	for (FlatImage* platform : platformArray)
@@ -72,7 +120,14 @@ bool Scene1::OnCreate() {
 	return true;
 }
 
-void Scene1::OnDestroy() {}
+void Scene1::OnDestroy() {
+	
+		if (backgroundMusic) {
+			Mix_FreeMusic(backgroundMusic);
+			backgroundMusic = nullptr;
+		}
+	
+}
 
 void Scene1::Update(const float deltaTime) {
 	//  ------------- update screen position -----------------------
@@ -112,9 +167,16 @@ void Scene1::Update(const float deltaTime) {
 }
 
 void Scene1::Render() {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
+	//render background image
+	if (sceneAssets.backgroundTexture) {
+		SDL_RenderCopy(renderer, sceneAssets.backgroundTexture, NULL, NULL);
+	}
+	else {
+		std::cout << "background texture is null!\n";
+	}
 
 	// render platform
 	Vec3 screenCoords;
