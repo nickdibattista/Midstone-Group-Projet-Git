@@ -72,7 +72,7 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
         case SDL_SCANCODE_SPACE:
             if (grounded) 
             {
-                ApplyForce(Vec3(0.0f, 8.0f, 0.0f));
+                vel.y = movSpeed * 2.0f;
                 grounded = false;
                 std::cout << "try to jump" << std::endl;
             }

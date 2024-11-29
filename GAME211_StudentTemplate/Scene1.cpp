@@ -9,7 +9,7 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	renderer = SDL_GetRenderer(window);
 	xAxis = 25.0f;
 	yAxis = 15.0f;
-	gravity = Vec3(0.0f, -4.0f, 0.0f);
+	gravity = Vec3(0.0f, -20.0f, 0.0f);
 }
 
 Scene1::~Scene1(){
@@ -96,10 +96,10 @@ void Scene1::Update(const float deltaTime) {
 
 	doCollisions();
 
-	//apply gravity
-	if (game->getPlayer()->getGrounded() == false) {
+	// apply gravity
+	if (!game->getPlayer()->getGrounded()) {
 		game->getPlayer()->ApplyForce(gravity);
-		std::cout << "apply grav" << std::endl;
+		// std::cout << "apply grav" << std::endl;
 	}
 	
 
@@ -160,20 +160,61 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 
 void Scene1::doCollisions() {
 	// check collisions with every platform
+	bool collision = false;
 	for (FlatImage* platform : platformArray)
 	{
-
 		if (checkCollision(*game->getPlayer(), *platform)) {
-			std::cout << "collision" << std::endl;
-			// now that we have a collision we have to do position correction and act on the type of collision
-			
-			game->getPlayer()->setGrounded(true);
-			game->getPlayer()->setVel(Vec3(game->getPlayer()->getVel().x, 0.0f, 0.0f));
-			game->getPlayer()->setAcc(Vec3());
-			return;
+			CollisionType(*game->getPlayer(), *platform);
+			collision = true;
 		}
+	}
+	if (!collision) {
+		game->getPlayer()->setGrounded(false);
+	}
+}
+
+void Scene1::CollisionType(PlayerBody& player, FlatImage& platform) {
+	Vec3 playerSize = Vec3(player.getPixels(scale) * 25.0f / 1000.0f, player.getPixels(scale) * 15.0f / 600.0f, 0.0f);
+	Vec3 platformSize = Vec3(platform.GetImageSizeX() * 25.0f / 1000.0f, platform.GetImageSizeY() * 15.0f / 600.0f, 0.0f);
+	
+	// on the sides
+	if (player.getPos().x + playerSize.x * 0.4f <= platform.GetPos().x - platformSize.x * 0.5f || 
+		player.getPos().x - playerSize.x * 0.4f >= platform.GetPos().x + platformSize.x * 0.5f) {
+		if (player.getPos().y + playerSize.y * 0.4f >= platform.GetPos().y - platformSize.y * 0.5f &&
+			player.getPos().y - playerSize.y * 0.4f <= platform.GetPos().y + platformSize.y * 0.5f) {
+			// from the right
+			if (player.getPos().x < platform.GetPos().x) {
+				player.setPos(Vec3(platform.GetPos().x - platformSize.x * 0.5f - playerSize.x * 0.5f, player.getPos().y, 0.0f));
+				if (player.getVel().x > 0) {
+					player.setVel(Vec3(0.0f, player.getVel().y, 0.0f));
+				}
+			}
+			// from the left
+			else {
+				player.setPos(Vec3(platform.GetPos().x + platformSize.x * 0.5f + playerSize.x * 0.5f, player.getPos().y, 0.0f));
+				if (player.getVel().x < 0) {
+					player.setVel(Vec3(0.0f, player.getVel().y, 0.0f));
+				}
+			}
+		}
+	}
+	// within the platform
+	else {
+		// from above
+		if (player.getPos().y > platform.GetPos().y) {
+			player.setPos(Vec3(player.getPos().x, platform.GetPos().y + platformSize.y * 0.5f + playerSize.y * 0.5f, 0.0f));
+			if (player.getVel().y < 0) {
+				player.setVel(Vec3(player.getVel().x, 0.0f, 0.0f));
+				player.setAcc(Vec3());
+				player.setGrounded(true);
+			}
+		}
+		// from underneath
 		else {
-			game->getPlayer()->setGrounded(false);
+			player.setPos(Vec3(player.getPos().x, platform.GetPos().y - platformSize.y * 0.5f - playerSize.y * 0.5f, 0.0f));
+			if (player.getVel().y > 0) {
+				player.setVel(Vec3(player.getVel().x, 0.0f, 0.0f));
+			}
 		}
 	}
 }
