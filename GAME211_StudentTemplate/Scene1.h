@@ -8,6 +8,7 @@
 #include "TileMap.h"
 #include "FlatImage.h"
 #include <vector>
+#include <SDL_mixer.h>
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -23,6 +24,7 @@ private:
 	std::vector<FlatImage*> platformArray; //an array of every platform
 	std::vector<FlatImage*> skyArray; //an array for the sky
 	float scale = 2.5f;
+	Mix_Music* backgroundMusic = nullptr;
 
 public:
 	// This constructor may be different from what you've seen before

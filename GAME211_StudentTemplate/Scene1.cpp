@@ -16,6 +16,29 @@ Scene1::~Scene1(){
 }
 
 bool Scene1::OnCreate() {
+	//Start background music
+	if (SDL_Init(SDL_INIT_AUDIO) < 0)
+	{
+		std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
+		return -1;
+
+	}
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0)
+	{
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << "\n";
+	}
+	Mix_Music* backgroundMusic = Mix_LoadMUS("Sounds/backgroundMusic.mp3");
+	if (!backgroundMusic) {
+		std::cout << "Failed to load background music! SDL_Mixer Error: " << Mix_GetError() << "\n";
+	}
+
+	if (Mix_PlayMusic(backgroundMusic, -1) == -1) {  // -1 means loop indefinitely
+		std::cerr << "Failed to play music: " << Mix_GetError() << std::endl;
+	}
+	// Set volume -> EXAMPLE: MIX_MAX_VOLUME / 2 = 50% volume
+	Mix_VolumeMusic(MIX_MAX_VOLUME / 5);
+
+
 	int w, h;
 
 	SDL_GetWindowSize(window,&w,&h);
@@ -39,18 +62,18 @@ bool Scene1::OnCreate() {
 	Vec3 pos;
 	// populate this array with all the platforms
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(24.0f, -1.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(28.0f, -5.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(36.0f, -7.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(42.0f, -7.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -10.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -13.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -16.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -19.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
-	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(20.0f, 0.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(28.0f, -1.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(38.0f, -6.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(45.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(55.0f, -7.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -10.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -13.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -16.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -19.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
+	//platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
 
 
 	// check everything in the array was done properly :p
@@ -80,7 +103,10 @@ bool Scene1::OnCreate() {
 	return true;
 }
 
-void Scene1::OnDestroy() {}
+void Scene1::OnDestroy() {
+	Mix_FreeMusic(backgroundMusic);
+	backgroundMusic = nullptr;
+}
 
 void Scene1::Update(const float deltaTime) {
 	//  ------------- update screen position -----------------------
@@ -109,14 +135,8 @@ void Scene1::Update(const float deltaTime) {
 		game->getPlayer()->ApplyForce(gravity);
 		std::cout << "apply grav" << std::endl;
 	}
-	
-
-	//std::cout << game->getPlayer()->getVel().y << std::endl;
 
 	game->getPlayer()->Update(deltaTime);
-
-	// print player pos
-	// std::cout << game->getPlayer()->getPos().x << " " << game->getPlayer()->getPos().y << std::endl;
 }
 
 void Scene1::Render() {
