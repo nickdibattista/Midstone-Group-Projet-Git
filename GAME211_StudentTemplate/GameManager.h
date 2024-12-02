@@ -50,6 +50,7 @@ public:
 	SDL_Renderer* getRenderer();
 
 	Uint32 getChangeScene() { return changeSceneEventType; };
+	Uint32 getWinScene() { return winSceneEventType; }
 
 	void Run();
     

@@ -27,7 +27,7 @@ bool SceneStart::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	// load logo
-	Logo = new FlatImage("Sprites/Logo.png", this, scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
+	Logo = new FlatImage("Sprites/Logo.png", this, false, scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
 	if (!Logo->OnCreate()) {
 		std::cerr << "no Logo" << std::endl;
 		return false;
@@ -35,7 +35,7 @@ bool SceneStart::OnCreate() {
 
 	// load background
 	// TODO make a better background logo
-	Background = new FlatImage("Sprites/StartSceneBg.png", this, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
+	Background = new FlatImage("Sprites/StartSceneBg.png", this, false, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
 	if (!Background->OnCreate()) {
 		std::cerr << "no start background" << std::endl;
 		return false;

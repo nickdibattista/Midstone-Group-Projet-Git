@@ -1,7 +1,7 @@
 #include "FlatImage.h"
 #include "Vector.h"
 
-FlatImage::FlatImage(const string& fileName, Scene* owner_, float scale_, Vec3 pos_) {
+FlatImage::FlatImage(const string& fileName, Scene* owner_, bool isEnd, float scale_, Vec3 pos_) {
 	scene = owner_;
 
 	image = IMG_Load(fileName.c_str());

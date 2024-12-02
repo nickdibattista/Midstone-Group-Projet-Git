@@ -132,8 +132,9 @@ void GameManager::handleEvents()
         }
         else if (event.type == winSceneEventType)
         {
-            // Load scene1
+            // Load scene3
             LoadScene(3);
+            Mix_CloseAudio();
             break;
         }
         else if (event.type == SDL_KEYDOWN)
@@ -154,6 +155,7 @@ void GameManager::handleEvents()
                 break;
             case SDL_SCANCODE_2:
                 LoadScene(3);
+                Mix_CloseAudio();
                 break;
             default:
                 break;
