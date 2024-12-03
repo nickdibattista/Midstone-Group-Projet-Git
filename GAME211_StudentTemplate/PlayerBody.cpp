@@ -9,13 +9,32 @@
 
 bool PlayerBody::OnCreate()
 {
+    SDL_Renderer* renderer = game->getRenderer();
+
+    // load walking texture
     image = IMG_Load("Sprites/MikeyMountaintopWalk.png");
-    SDL_Renderer *renderer = game->getRenderer();
-    walkAnim = SDL_CreateTextureFromSurface( renderer, image );
+    walkTexture = SDL_CreateTextureFromSurface( renderer, image );
     if (image == nullptr) {
-        std::cerr << "Can't open the player sprite" << std::endl;
+        std::cerr << "Can't open the player walking sprite" << std::endl;
         return false;
     }
+
+    // load idle texture
+    image = IMG_Load("Sprites/MikeyMountaintopIdle.png");
+    idleTexture = SDL_CreateTextureFromSurface(renderer, image);
+    if (image == nullptr) {
+        std::cerr << "Can't open the player idle sprite" << std::endl;
+        return false;
+    }
+
+    // 
+    image = IMG_Load("Sprites/MikeyMountaintopJump.png");
+    jumpTexture = SDL_CreateTextureFromSurface(renderer, image);
+    if (image == nullptr) {
+        std::cerr << "Can't open the player jump sprite" << std::endl;
+        return false;
+    }
+
     return true;
 }
 
@@ -34,17 +53,47 @@ void PlayerBody::Render( float scale )
     // convert the position from game coords to screen coords.
     screenCoords = projectionMatrix * pos;
 
-    // frame rate of animation
-    Uint32 ticks = SDL_GetTicks();
-    Uint32 sprite = (ticks / 100) % 4;
+    // render the appropiate animation
+    if (activeAnim == walkAnim) {
+        Uint32 ticks = SDL_GetTicks();
+        Uint32 sprite = (ticks / 100) % 4;
 
-    // cut animation, place it in world, resize it.
-    // srcret is based on the image file. The one for the walking animation
-    SDL_Rect srcrect = { sprite * size, 0, size, size };
-    screenCoords = projectionMatrix * getPos();
-    SDL_Rect dscrect = { screenCoords.x - 0.5f * side, screenCoords.y - 0.5f * side, side, side};
+        // cut animation, place it in world, resize it.
+        // srcret is based on the image file. The one for the walking animation
+        SDL_Rect srcrect = { sprite * size, 0, size, size };
+        screenCoords = projectionMatrix * getPos();
+        SDL_Rect dscrect = { screenCoords.x - 0.5f * side, screenCoords.y - 0.5f * side, side, side };
 
-    SDL_RenderCopy(renderer, walkAnim, &srcrect, &dscrect);
+        if (facingRight) {
+            SDL_RenderCopyEx(renderer, walkTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_NONE);
+        }
+        else {
+            SDL_RenderCopyEx(renderer, walkTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_HORIZONTAL);
+        }
+    }
+    if (activeAnim == idleAnim) {
+        SDL_Rect srcrect = { 0, 0, size, size };
+        screenCoords = projectionMatrix * getPos();
+        SDL_Rect dscrect = { screenCoords.x - 0.5f * side, screenCoords.y - 0.5f * side, side, side };
+        if (facingRight) {
+            SDL_RenderCopyEx(renderer, idleTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_NONE);
+        }
+        else {
+            SDL_RenderCopyEx(renderer, idleTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_HORIZONTAL);
+        }
+    }
+    if (activeAnim == jumpAnim) {
+        SDL_Rect srcrect = { 0, 0, size, size };
+        screenCoords = projectionMatrix * getPos();
+        SDL_Rect dscrect = { screenCoords.x - 0.5f * side, screenCoords.y - 0.5f * side, side, side };
+        if (facingRight) {
+            SDL_RenderCopyEx(renderer, jumpTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_NONE);
+        }
+        else {
+            SDL_RenderCopyEx(renderer, jumpTexture, &srcrect, &dscrect, 0.0f, nullptr, SDL_FLIP_HORIZONTAL);
+        }
+    }
+
 }
 
 void PlayerBody::HandleEvents( const SDL_Event& event )
@@ -55,19 +104,10 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
         switch (event.key.keysym.scancode)
         {
         case SDL_SCANCODE_A:
-            vel.x = -movSpeed;
+            movHor = -1;
             break;
         case SDL_SCANCODE_D:
-            vel.x = movSpeed;
-            break;
-        case SDL_SCANCODE_W:
-            vel.y = movSpeed;
-            break;
-        case SDL_SCANCODE_S:
-            vel.y = -movSpeed;
-            break;
-        case SDL_SCANCODE_R:
-            movSpeed = 10.0f;
+            movHor = 1;
             break;
         case SDL_SCANCODE_SPACE:
             if (grounded) 
@@ -87,19 +127,10 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
         switch (event.key.keysym.scancode)
         {
         case SDL_SCANCODE_A:
-            vel.x = 0.0f;
+            movHor = 0;
             break;
         case SDL_SCANCODE_D:
-            vel.x = 0.0f;
-            break;
-        case SDL_SCANCODE_W:
-            vel.y = 0.0f;
-            break;
-        case SDL_SCANCODE_S:
-            vel.y = -0.0f;
-            break;
-        case SDL_SCANCODE_R:
-            movSpeed = 4.0f;
+            movHor = 0;
             break;
         }
     }
@@ -112,6 +143,43 @@ void PlayerBody::Update( float deltaTime )
 
     Body::Update( deltaTime );
 
+    vel.x = movSpeed * movHor;
+
+    // animation tree !!! (hurray...)
+    switch (activeAnim) 
+    {
+    case walkAnim:
+        if (!grounded) {
+            activeAnim = jumpAnim;
+        }
+        else if (vel.x == 0 && grounded) {
+            activeAnim = idleAnim;
+        }
+        break;
+    case idleAnim:
+        if (!grounded) {
+            activeAnim = jumpAnim;
+        }
+        else if (vel.x != 0 && grounded) {
+            activeAnim = walkAnim;
+        }
+        break;
+    case jumpAnim:
+        if (vel.y == 0 && vel.x == 0) {
+            activeAnim = idleAnim;
+        }
+        else if (vel.y == 0 && vel.x != 0) {
+            activeAnim = walkAnim;
+        }
+        break;
+    }
+
+    if (vel.x < 0) {
+        facingRight = false;
+    }
+    else if (vel.x > 0) {
+        facingRight = true;
+    }
 }
 
 void PlayerBody::ApplyForce(Vec3 force) {
