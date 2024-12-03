@@ -27,14 +27,13 @@ bool SceneWinScreen::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	// load logo
-	Logo = new FlatImage("Sprites/Logo.png", this, false, scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
-	if (!Logo->OnCreate()) {
+	victoryLogo = new FlatImage("Sprites/Victory.png", this, false, scale = 2.0f, pos = Vec3(12.5f, 11.0f, 0.0f));
+	if (!victoryLogo->OnCreate()) {
 		std::cerr << "no Logo" << std::endl;
 		return false;
 	}
 
 	// load background
-	// TODO make a better background logo
 	Background = new FlatImage("Sprites/StartSceneBg.png", this, false, scale = 6.0f, pos = Vec3(12.5f, 7.5f, 0.0f));
 	if (!Background->OnCreate()) {
 		std::cerr << "no start background" << std::endl;
@@ -43,7 +42,7 @@ bool SceneWinScreen::OnCreate() {
 
 	// load start button texture
 	// TODO improve the button textures, they get lost with the bg ;-;
-	menuReturn = new Button("Sprites/StartButton.png", this, pos = Vec3(12.5f, 6.0f, 0.0f), scale = 2.0f);
+	menuReturn = new Button("Sprites/MenuButton.png", this, pos = Vec3(12.5f, 6.0f, 0.0f), scale = 2.0f);
 	if (!menuReturn->OnCreate()) {
 		std::cerr << "no start button" << std::endl;
 		return false;
@@ -94,7 +93,7 @@ void SceneWinScreen::Render() {
 	Background->Render();
 	
 	// display logo
-	Logo->Render();
+	victoryLogo->Render();
 
 	// display buttons
 	menuReturn->Render();

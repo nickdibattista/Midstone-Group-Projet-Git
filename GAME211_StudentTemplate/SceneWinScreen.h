@@ -16,7 +16,7 @@ private:
 	SDL_Renderer* renderer;	// the renderer associated with SDL window
 	Matrix4 projectionMatrix;	// set in OnCreate()
 	Matrix4 inverseProjection;	// set in OnCreate()
-	FlatImage* Logo; //set in OnCreate()
+	FlatImage* victoryLogo; //set in OnCreate()
 	FlatImage* Background; //set in OnCreate()
 	Button* menuReturn; //set in OnCreate()
 	Button* exit; //set in OnCreate()
