@@ -48,7 +48,11 @@
     <ClCompile Include="FlatImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="SceneWinScreen.cpp">
+=======
+    <ClCompile Include="Yeti.cpp">
+>>>>>>> origin/Miguel
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +90,11 @@
     <ClInclude Include="FlatImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="SceneWinScreen.h">
+=======
+    <ClInclude Include="Yeti.h">
+>>>>>>> origin/Miguel
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -17,12 +17,26 @@ class PlayerBody : public Body
 {
 protected:
     class GameManager* game;
-    SDL_Texture* walkAnim;
+    SDL_Texture* walkTexture;
+    SDL_Texture* idleTexture;
+    SDL_Texture* jumpTexture;
     float pixels = 16.0f;
     float grounded = false;
     float movSpeed = 4.0f;
+<<<<<<< HEAD
 private:
     Mix_Chunk* jumpSoundEffect;
+=======
+    enum Animation {
+        walkAnim,
+        idleAnim,
+        jumpAnim
+    };
+    Animation activeAnim = walkAnim;
+    bool facingRight = true;
+    int movHor = 0;
+
+>>>>>>> origin/Miguel
 public:
 
     PlayerBody() : Body{}

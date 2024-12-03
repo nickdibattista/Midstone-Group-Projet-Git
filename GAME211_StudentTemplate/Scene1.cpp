@@ -78,6 +78,7 @@ bool Scene1::OnCreate() {
 
 
 	// populate this array with all the platforms
+<<<<<<< HEAD
 	Vec3 pos;
 	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, false, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
 	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, false, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
@@ -115,6 +116,21 @@ bool Scene1::OnCreate() {
 	//Ending Platform
 	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, true, scale, pos = Vec3(137.0f, -55.0f, 0.0f)));
 	platformArray.back()->SetIsEndPlatform(true);
+=======
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(12.0f, 4.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(20.0f, 2.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Board.png", this, scale, pos = Vec3(24.0f, -1.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform2.png", this, scale, pos = Vec3(28.0f, -5.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(36.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform3.png", this, scale, pos = Vec3(42.0f, -7.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -10.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -13.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -16.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -19.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(48.0f, -22.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform4.png", this, scale, pos = Vec3(52.0f, -25.0f, 0.0f)));
+	platformArray.push_back(new FlatImage("Sprites/Platform1.png", this, scale, pos = Vec3(60.0f, -29.0f, 0.0f)));
+>>>>>>> origin/Miguel
 
 	// check everything in the array was done properly :p
 	for (FlatImage* platform : platformArray)
@@ -125,20 +141,30 @@ bool Scene1::OnCreate() {
 		}
 	}
 
-	// this array will be generated procedurally based on the player's position
-	// fill that function on update if(player->pos().x + something > skyarray.top()->pos.x) add another one (?)
-	// otherwise just fill it in like the first one .-.
-	/*skyArray.push_back(new FlatImage("Sprites/SnowBackground.png", this, scale, pos = Vec3(12.0f, 8.0f, 0.0f)));
-	for (FlatImage* sky : skyArray)
-	{
-		if (!sky->OnCreate()) {
-			std::cout << "no platform" << std::endl;
-			return false;
-		}
-	}*/
+	progressBar = new FlatImage("Sprites/ProgressBar.png", this, scale, pos = Vec3());
+	if (!progressBar->OnCreate()) {
+		std::cout << "no progress bar" << std::endl;
+		return false;
+	}
 
-	// any other arrays for missellaneous decorations or clouds (clouds might have to go on a separate one
-	// so they can move)
+	playerIcon = new FlatImage("Sprites/PlayerIcon.png", this, scale, pos = Vec3());
+	if (!playerIcon->OnCreate()) {
+		std::cout << "no player icon" << std::endl;
+		return false;
+	}
+
+	YetiIcon = new FlatImage("Sprites/YetiIcon.png", this, scale, pos = Vec3());
+	if (!YetiIcon->OnCreate()) {
+		std::cout << "no yeti icon" << std::endl;
+		return false;
+	}
+
+	yeti = new Yeti(Vec3(12.5f, 30.0f, 0.0f), Vec3(), Vec3(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, game);
+	if (!yeti->OnCreate()) {
+		std::cout << "no yeti" << std::endl;
+		return false;
+	}
+
 
 	return true;
 }
@@ -153,6 +179,18 @@ void Scene1::OnDestroy() {
 }
 
 void Scene1::Update(const float deltaTime) {
+
+	doCollisions();
+
+	// apply gravity
+	if (!game->getPlayer()->getGrounded()) {
+		game->getPlayer()->ApplyForce(gravity);
+	}
+
+	// update player
+	game->getPlayer()->Update(deltaTime);
+	yeti->Update(deltaTime);
+
 	//  ------------- update screen position -----------------------
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
@@ -161,15 +199,16 @@ void Scene1::Update(const float deltaTime) {
 
 	float left, right, bottom, top;
 
-	left = game->getPlayer()->getPos().x - xAxis / 2.0f;
-	right = game->getPlayer()->getPos().x + xAxis / 2.0f;
-	bottom = game->getPlayer()->getPos().y - yAxis / 2.0f;
-	top = game->getPlayer()->getPos().y + yAxis / 2.0f;
+	left = game->getPlayer()->getPos().x - xAxis * 0.5f;
+	right = game->getPlayer()->getPos().x + xAxis * 0.5f;
+	bottom = game->getPlayer()->getPos().y - yAxis * 0.5f;
+	top = game->getPlayer()->getPos().y + yAxis * 0.5f;
 
 	Matrix4 ortho = MMath::orthographic(left, right, bottom, top, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
 	//  ------------- update screen position -----------------------
 
+<<<<<<< HEAD
 	// Update player
 
 	doCollisions();
@@ -179,14 +218,35 @@ void Scene1::Update(const float deltaTime) {
 		game->getPlayer()->ApplyForce(gravity);
 		// std::cout << "apply grav" << std::endl;
 	}
+=======
+	// update UI
+	progressBar->SetPos(Vec3(left + xAxis / 2.0f, top - 1.0f, 0.0f));
+>>>>>>> origin/Miguel
 	
+	// player icon is more delicate
+	// the start is 10.5f
+	// the end is 14.5f
+	// player icon must move 4 units
+	// formula is (player.pos.x - player.initialPos.x) / (lastPlat.x - firstPlat.x) * 4
+	float PlayerIconMovement;
+	PlayerIconMovement = game->getPlayer()->getPos().x - 12.5f;
+	PlayerIconMovement /= (platformArray.back()->GetPos().x - platformArray[0]->GetPos().x);
+	PlayerIconMovement *= 4.0f;
+	playerIcon->SetPos(Vec3(left + 10.5f + PlayerIconMovement, top - 1.4f, 0.0f));
 
-	//std::cout << game->getPlayer()->getVel().y << std::endl;
+	float YetiIconMovement;
+	YetiIconMovement = yeti->getPos().x - 12.5f;
+	YetiIconMovement /= (platformArray.back()->GetPos().x - platformArray[0]->GetPos().x);
+	YetiIconMovement *= 4.0f;
+	YetiIcon->SetPos(Vec3(left + 10.4f + YetiIconMovement, top - 1.4f, 0.0f));
 
-	game->getPlayer()->Update(deltaTime);
+	if (YetiIcon->GetPos().x >= playerIcon->GetPos().x && !yeti->getPouncing()) {
+		yeti->Pounce(game->getPlayer()->getPos());
+	}
 
-	// print player pos
-	// std::cout << game->getPlayer()->getPos().x << " " << game->getPlayer()->getPos().y << std::endl;
+	if (!yeti->getActive() && SDL_GetTicks() > 3000) {
+		yeti->Activate();
+	}
 }
 
 void Scene1::Render() {
@@ -204,7 +264,6 @@ void Scene1::Render() {
 	// render platform
 	Vec3 screenCoords;
 
-
 	for (FlatImage* platform : platformArray)
 	{
 		platform->Render();
@@ -212,6 +271,12 @@ void Scene1::Render() {
 
 	// render player
 	game->getPlayer()->Render(scale);
+
+	yeti->Render(scale);
+
+	progressBar->Render();
+	playerIcon->Render();
+	YetiIcon->Render();
 
 	SDL_RenderPresent(renderer);
 }
@@ -246,12 +311,16 @@ bool Scene1::checkCollision(PlayerBody &player, FlatImage &platform)
 void Scene1::doCollisions() {
 	// check collisions with every platform
 	bool collision = false;
+<<<<<<< HEAD
 	bool reachedEnd = false;
+=======
+>>>>>>> origin/Miguel
 	for (FlatImage* platform : platformArray)
 	{
 		if (checkCollision(*game->getPlayer(), *platform)) {
 			CollisionType(*game->getPlayer(), *platform);
 			collision = true;
+<<<<<<< HEAD
 			if (platform->GetIsEndPlatform()) {
 				reachedEnd = true;
 				if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -261,11 +330,14 @@ void Scene1::doCollisions() {
 					std::cout << "error playing sound: " << Mix_GetError() << std::endl;
 				}
 			}
+=======
+>>>>>>> origin/Miguel
 		}
 	}
 	if (!collision) {
 		game->getPlayer()->setGrounded(false);
 	}
+<<<<<<< HEAD
 	if (reachedEnd) {
 		SDL_Event gameWon;
 		SDL_memset(&gameWon, 0, sizeof(gameWon));
@@ -275,25 +347,41 @@ void Scene1::doCollisions() {
 		gameWon.user.data2 = nullptr;
 		SDL_PushEvent(&gameWon);
 	}
+=======
+>>>>>>> origin/Miguel
 }
 
 void Scene1::CollisionType(PlayerBody& player, FlatImage& platform) {
 	Vec3 playerSize = Vec3(player.getPixels(scale) * 25.0f / 1000.0f, player.getPixels(scale) * 15.0f / 600.0f, 0.0f);
 	Vec3 platformSize = Vec3(platform.GetImageSizeX() * 25.0f / 1000.0f, platform.GetImageSizeY() * 15.0f / 600.0f, 0.0f);
 	
+<<<<<<< HEAD
 	// on the sides
 	if (player.getPos().x + playerSize.x * 0.4f <= platform.GetPos().x - platformSize.x * 0.5f || 
 		player.getPos().x - playerSize.x * 0.4f >= platform.GetPos().x + platformSize.x * 0.5f) {
 		if (player.getPos().y + playerSize.y * 0.4f >= platform.GetPos().y - platformSize.y * 0.5f &&
 			player.getPos().y - playerSize.y * 0.4f <= platform.GetPos().y + platformSize.y * 0.5f) {
 			// from the right
+=======
+	// player is either right or left of the platform
+	if (player.getPos().x + playerSize.x * 0.4f <= platform.GetPos().x - platformSize.x * 0.5f || 
+		player.getPos().x - playerSize.x * 0.4f >= platform.GetPos().x + platformSize.x * 0.5f) {
+		// check player is not on top or under the platform
+		if (player.getPos().y + playerSize.y * 0.4f >= platform.GetPos().y - platformSize.y * 0.5f &&
+			player.getPos().y - playerSize.y * 0.4f <= platform.GetPos().y + platformSize.y * 0.5f) {
+			// case 1: player is at the right
+>>>>>>> origin/Miguel
 			if (player.getPos().x < platform.GetPos().x) {
 				player.setPos(Vec3(platform.GetPos().x - platformSize.x * 0.5f - playerSize.x * 0.5f, player.getPos().y, 0.0f));
 				if (player.getVel().x > 0) {
 					player.setVel(Vec3(0.0f, player.getVel().y, 0.0f));
 				}
 			}
+<<<<<<< HEAD
 			// from the left
+=======
+			// case 2: player is at the left
+>>>>>>> origin/Miguel
 			else {
 				player.setPos(Vec3(platform.GetPos().x + platformSize.x * 0.5f + playerSize.x * 0.5f, player.getPos().y, 0.0f));
 				if (player.getVel().x < 0) {
@@ -302,9 +390,15 @@ void Scene1::CollisionType(PlayerBody& player, FlatImage& platform) {
 			}
 		}
 	}
+<<<<<<< HEAD
 	// within the platform
 	else {
 		// from above
+=======
+	// within the platform's left and right limits
+	else {
+		// case 1: player is above platform
+>>>>>>> origin/Miguel
 		if (player.getPos().y > platform.GetPos().y) {
 			player.setPos(Vec3(player.getPos().x, platform.GetPos().y + platformSize.y * 0.5f + playerSize.y * 0.5f, 0.0f));
 			if (player.getVel().y < 0) {
@@ -313,7 +407,11 @@ void Scene1::CollisionType(PlayerBody& player, FlatImage& platform) {
 				player.setGrounded(true);
 			}
 		}
+<<<<<<< HEAD
 		// from underneath
+=======
+		// case2: player is underneath platform
+>>>>>>> origin/Miguel
 		else {
 			player.setPos(Vec3(player.getPos().x, platform.GetPos().y - platformSize.y * 0.5f - playerSize.y * 0.5f, 0.0f));
 			if (player.getVel().y > 0) {
