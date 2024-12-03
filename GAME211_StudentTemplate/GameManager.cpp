@@ -148,6 +148,13 @@ void GameManager::handleEvents()
             Mix_CloseAudio();
             break;
         }
+        else if (event.type == MenuSceneEventType)
+        {
+            // Load scene3
+            LoadScene(2);
+            Mix_CloseAudio();
+            break;
+        }
         else if (event.type == SDL_KEYDOWN)
         {
             switch (event.key.keysym.scancode)

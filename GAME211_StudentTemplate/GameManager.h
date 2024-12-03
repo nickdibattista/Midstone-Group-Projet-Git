@@ -28,6 +28,7 @@ private:
     class PlayerBody *player;
 	Uint32 changeSceneEventType;
 	Uint32 winSceneEventType;
+	Uint32 MenuSceneEventType;
 
 	void handleEvents();
 	void LoadScene(int i);
@@ -51,6 +52,7 @@ public:
 
 	Uint32 getChangeScene() { return changeSceneEventType; };
 	Uint32 getWinScene() { return winSceneEventType; }
+	Uint32 getMenuScene() { return MenuSceneEventType; }
 
 	void Run();
     

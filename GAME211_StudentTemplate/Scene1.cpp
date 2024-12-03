@@ -223,12 +223,31 @@ void Scene1::Update(const float deltaTime) {
 	YetiIconMovement *= 4.0f;
 	YetiIcon->SetPos(Vec3(left + 10.4f + YetiIconMovement, top - 1.4f, 0.0f));
 
+	// yeti events
 	if (YetiIcon->GetPos().x >= playerIcon->GetPos().x && !yeti->getPouncing()) {
 		yeti->Pounce(game->getPlayer()->getPos());
 	}
 
 	if (!yeti->getActive() && SDL_GetTicks() > 3000) {
 		yeti->Activate();
+	}
+	
+	// death events
+	bool dead;
+
+	dead = game->getPlayer()->getPos().y < (platformArray.back()->GetPos().y - platformArray[0]->GetPos().y) 
+		/ (platformArray.back()->GetPos().x - platformArray[0]->GetPos().x) * game->getPlayer()->getPos().x - 4.0f 
+		|| yeti->getPos().y <= game->getPlayer()->getPos().y;
+
+	if (dead) {
+		// play dead sound
+		SDL_Event event;
+		SDL_memset(&event, 0, sizeof(event));
+		event.type = game->getMenuScene();
+		event.user.code = 1;
+		event.user.data1 = nullptr;
+		event.user.data2 = nullptr;
+		SDL_PushEvent(&event);
 	}
 }
 

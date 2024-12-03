@@ -73,6 +73,6 @@ void Yeti::Activate() {
 
 void Yeti::Pounce(Vec3 pos_) {
 	pouncing = true;
-	pos = pos_ + Vec3(0.0f, 5.0f, 0.0f);
-	vel = (pos - pos_) / 2.0f;
+	pos = pos_ + Vec3(0.0f, 8.0f, 0.0f);
+	vel = Vec3(0.0f, -20.0f, 0.0f);
 }
