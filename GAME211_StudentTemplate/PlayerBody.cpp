@@ -19,16 +19,6 @@ bool PlayerBody::OnCreate()
         std::cerr << "Can't open the player walking sprite" << std::endl;
         return false;
     }
-    
-
-    jumpSoundEffect = Mix_LoadWAV("Sounds/JumpEffectWav.wav");
-    Mix_VolumeChunk(jumpSoundEffect, MIX_MAX_VOLUME);
-    if (!jumpSoundEffect) {
-        std::cerr << "Failed to load jump sound effect: " << Mix_GetError() << std::endl;
-    }
-    else {
-        std::cout << "Jump sound effect loaded successfully!" << std::endl;
-    }
 
 
     // load idle texture

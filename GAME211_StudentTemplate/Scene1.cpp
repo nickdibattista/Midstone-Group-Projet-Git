@@ -150,6 +150,9 @@ bool Scene1::OnCreate() {
 	}
 
 
+
+	game->getPlayer()->setPos(Vec3(xAxis * 0.5f, yAxis * 0.5, 0.0f));
+
 	return true;
 }
 
@@ -159,7 +162,6 @@ void Scene1::OnDestroy() {
 			Mix_FreeMusic(backgroundMusic);
 			backgroundMusic = nullptr;
 		}
-	
 }
 
 void Scene1::Update(const float deltaTime) {
