@@ -26,14 +26,11 @@ private:
 	FlatImage* playerIcon; // set in OnCreate()
 	FlatImage* YetiIcon; // appears after event
 	float scale = 2.5f;
-<<<<<<< HEAD
 	Mix_Music* backgroundMusic = nullptr;
 	Mix_Chunk* killEffect;
 	Mix_Chunk* winEffect;
 	Mix_Chunk* yetiGrowlEffect;
-=======
 	Yeti* yeti; // set in OnCreate()
->>>>>>> origin/Miguel
 
 public:
 	// This constructor may be different from what you've seen before

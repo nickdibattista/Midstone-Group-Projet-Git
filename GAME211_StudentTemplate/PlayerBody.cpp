@@ -19,7 +19,6 @@ bool PlayerBody::OnCreate()
         std::cerr << "Can't open the player walking sprite" << std::endl;
         return false;
     }
-<<<<<<< HEAD
     
 
     jumpSoundEffect = Mix_LoadWAV("Sounds/JumpEffectWav.wav");
@@ -30,7 +29,7 @@ bool PlayerBody::OnCreate()
     else {
         std::cout << "Jump sound effect loaded successfully!" << std::endl;
     }
-=======
+
 
     // load idle texture
     image = IMG_Load("Sprites/MikeyMountaintopIdle.png");
@@ -48,7 +47,6 @@ bool PlayerBody::OnCreate()
         return false;
     }
 
->>>>>>> origin/Miguel
     return true;
 }
 
@@ -137,7 +135,7 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
             if (grounded) 
             {
                 vel.y = movSpeed * 2.0f;
-<<<<<<< HEAD
+
                 grounded = false; 
                 if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
                     std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
@@ -145,9 +143,6 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
                 if (Mix_PlayChannel(-1, jumpSoundEffect, 0) == -1) {
                     std::cout << "error playing sound: " << Mix_GetError() << std::endl;
                 }
-=======
-                grounded = false;
->>>>>>> origin/Miguel
                 std::cout << "try to jump" << std::endl;
             }
             
