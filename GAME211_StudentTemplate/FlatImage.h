@@ -17,7 +17,6 @@ class FlatImage
 private:
 	SDL_Surface* image;
 	SDL_Texture* texture;
-	SDL_Rect square;
 	Scene* scene;
 	Vec3 pos;
 	float scale;
@@ -29,6 +28,7 @@ public:
 	bool OnCreate();
 	void Render();
 	Vec3 GetPos() { return pos; }
+	void SetPos(Vec3 pos_) { pos = pos_; }
 	float GetImageSizeX() { return image->w * scale; }
 	float GetImageSizeY() { return image->h * scale; }
 	bool GetIsEndPlatform() const { return isEndPlatform; }
