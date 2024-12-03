@@ -65,6 +65,19 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 
+	YetiIcon = new FlatImage("Sprites/YetiIcon.png", this, scale, pos = Vec3());
+	if (!YetiIcon->OnCreate()) {
+		std::cout << "no yeti icon" << std::endl;
+		return false;
+	}
+
+	yeti = new Yeti(Vec3(12.5f, 30.0f, 0.0f), Vec3(), Vec3(), 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, game);
+	if (!yeti->OnCreate()) {
+		std::cout << "no yeti" << std::endl;
+		return false;
+	}
+
+
 	return true;
 }
 
@@ -81,6 +94,7 @@ void Scene1::Update(const float deltaTime) {
 
 	// update player
 	game->getPlayer()->Update(deltaTime);
+	yeti->Update(deltaTime);
 
 	//  ------------- update screen position -----------------------
 	int w, h;
@@ -106,12 +120,26 @@ void Scene1::Update(const float deltaTime) {
 	// the start is 10.5f
 	// the end is 14.5f
 	// player icon must move 4 units
-	// formula is (player.pos.x - player.intialPos.x) / (lastPlat.x - firstPlat.x) * 4
+	// formula is (player.pos.x - player.initialPos.x) / (lastPlat.x - firstPlat.x) * 4
 	float PlayerIconMovement;
 	PlayerIconMovement = game->getPlayer()->getPos().x - 12.5f;
 	PlayerIconMovement /= (platformArray.back()->GetPos().x - platformArray[0]->GetPos().x);
 	PlayerIconMovement *= 4.0f;
 	playerIcon->SetPos(Vec3(left + 10.5f + PlayerIconMovement, top - 1.4f, 0.0f));
+
+	float YetiIconMovement;
+	YetiIconMovement = yeti->getPos().x - 12.5f;
+	YetiIconMovement /= (platformArray.back()->GetPos().x - platformArray[0]->GetPos().x);
+	YetiIconMovement *= 4.0f;
+	YetiIcon->SetPos(Vec3(left + 10.4f + YetiIconMovement, top - 1.4f, 0.0f));
+
+	if (YetiIcon->GetPos().x >= playerIcon->GetPos().x && !yeti->getPouncing()) {
+		yeti->Pounce(game->getPlayer()->getPos());
+	}
+
+	if (!yeti->getActive() && SDL_GetTicks() > 3000) {
+		yeti->Activate();
+	}
 }
 
 void Scene1::Render() {
@@ -130,8 +158,11 @@ void Scene1::Render() {
 	// render player
 	game->getPlayer()->Render(scale);
 
+	yeti->Render(scale);
+
 	progressBar->Render();
 	playerIcon->Render();
+	YetiIcon->Render();
 
 	SDL_RenderPresent(renderer);
 }

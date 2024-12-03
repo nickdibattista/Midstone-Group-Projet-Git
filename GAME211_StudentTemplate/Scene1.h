@@ -7,6 +7,7 @@
 #include "Button.h"
 #include "TileMap.h"
 #include "FlatImage.h"
+#include "Yeti.h"
 #include <vector>
 
 using namespace MATH;
@@ -24,6 +25,7 @@ private:
 	FlatImage* playerIcon; // set in OnCreate()
 	FlatImage* YetiIcon; // appears after event
 	float scale = 2.5f;
+	Yeti* yeti; // set in OnCreate()
 
 public:
 	// This constructor may be different from what you've seen before
