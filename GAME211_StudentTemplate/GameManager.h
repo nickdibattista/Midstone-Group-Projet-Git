@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Scene.h"
 #include "PlayerBody.h"
+#include "MemoryPool.h"
 
 
 class GameManager {
@@ -23,7 +24,7 @@ private:
 	class Timer *timer;
 	bool isRunning;
 	class Scene *currentScene;
-
+	static MemoryPool* npcMemoryPool;
 	// This might be unfamiliar
     class PlayerBody *player;
 	Uint32 changeSceneEventType;
