@@ -17,11 +17,12 @@ private:
 	SDL_Window* window;		// an SDL window with a SDL renderer
 	SDL_Renderer* renderer;	// the renderer associated with SDL window
 	Matrix4 projectionMatrix;	// set in OnCreate()
-    Matrix4     inverseProjection;	// set in OnCreate()
-	Button* start;
+    Matrix4 inverseProjection;	// set in OnCreate()
 	Vec3 gravity;
 	std::vector<FlatImage*> platformArray; //an array of every platform
-	std::vector<FlatImage*> skyArray; //an array for the sky
+	FlatImage* progressBar; // set in OnCreate()
+	FlatImage* playerIcon; // set in OnCreate()
+	FlatImage* YetiIcon; // appears after event
 	float scale = 2.5f;
 
 public:

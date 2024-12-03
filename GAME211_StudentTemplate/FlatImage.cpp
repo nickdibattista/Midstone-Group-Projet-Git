@@ -44,6 +44,8 @@ void FlatImage::Render() {
 	w = static_cast<int>(image->w * scale);
 	h = static_cast<int>(image->h * scale);
 
+	SDL_Rect square;
+
 	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
 	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
 	square.w = w;
