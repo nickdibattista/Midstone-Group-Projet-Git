@@ -31,7 +31,13 @@ bool Scene1::OnCreate() {
 	else {
 		std::cout << "Kill sound effect loaded successfully!" << std::endl;
 	}
-	
+	yetiGrowlEffect = Mix_LoadWAV("Sounds/yetiGrowlEffect.wav");
+	if (!yetiGrowlEffect) {
+		std::cerr << "Failed to load kill sound effect: " << Mix_GetError() << std::endl;
+	}
+	else {
+		std::cout << "Kill sound effect loaded successfully!" << std::endl;
+	}
 
 
 	//Background Music
@@ -247,7 +253,7 @@ void Scene1::doCollisions() {
 			CollisionType(*game->getPlayer(), *platform);
 			collision = true;
 			if (platform->GetIsEndPlatform()) {
-				//reachedEnd = true;
+				reachedEnd = true;
 				if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 					std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
 				}

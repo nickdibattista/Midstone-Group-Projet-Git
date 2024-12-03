@@ -27,6 +27,7 @@ private:
 	Mix_Music* backgroundMusic = nullptr;
 	Mix_Chunk* killEffect;
 	Mix_Chunk* winEffect;
+	Mix_Chunk* yetiGrowlEffect;
 
 public:
 	// This constructor may be different from what you've seen before
