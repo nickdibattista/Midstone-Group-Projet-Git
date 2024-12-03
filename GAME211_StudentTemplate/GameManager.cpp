@@ -36,6 +36,17 @@ bool GameManager::OnCreate() {
 		return false;
 	}
 
+    //In-Game Background Music/Sound Effects
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
+        return -1;
+    }
+    Mix_AllocateChannels(16);
+    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
+        std::cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << "\n";
+        return -1;
+    }
+
     // select scene for specific assignment
 
     currentScene = new SceneStart(windowPtr->GetSDL_Window(), this);
@@ -171,6 +182,7 @@ void GameManager::OnDestroy(){
 	if (windowPtr) delete windowPtr;
 	if (timer) delete timer;
 	if (currentScene) delete currentScene;
+    player->AudioCleanup();  
 }
 
 // This might be unfamiliar

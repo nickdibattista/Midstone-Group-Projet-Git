@@ -17,8 +17,28 @@ bool PlayerBody::OnCreate()
         std::cerr << "Can't open the player sprite" << std::endl;
         return false;
     }
+    
+
+    jumpSoundEffect = Mix_LoadWAV("Sounds/JumpEffectWav.wav");
+    Mix_VolumeChunk(jumpSoundEffect, MIX_MAX_VOLUME);
+    if (!jumpSoundEffect) {
+        std::cerr << "Failed to load jump sound effect: " << Mix_GetError() << std::endl;
+    }
+    else {
+        std::cout << "Jump sound effect loaded successfully!" << std::endl;
+    }
     return true;
 }
+
+void PlayerBody::AudioCleanup()
+{
+    if (jumpSoundEffect) {
+       Mix_FreeChunk(jumpSoundEffect);
+       jumpSoundEffect = nullptr;        
+    }
+}
+
+
 
 void PlayerBody::Render( float scale )
 {
@@ -74,7 +94,13 @@ void PlayerBody::HandleEvents( const SDL_Event& event )
             if (grounded) 
             {
                 vel.y = movSpeed * 2.0f;
-                grounded = false;
+                grounded = false; 
+                if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+                    std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+                }
+                if (Mix_PlayChannel(-1, jumpSoundEffect, 0) == -1) {
+                    std::cout << "error playing sound: " << Mix_GetError() << std::endl;
+                }
                 std::cout << "try to jump" << std::endl;
             }
             

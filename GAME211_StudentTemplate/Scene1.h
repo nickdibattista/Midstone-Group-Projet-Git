@@ -25,6 +25,8 @@ private:
 	std::vector<FlatImage*> skyArray; //an array for the sky
 	float scale = 2.5f;
 	Mix_Music* backgroundMusic = nullptr;
+	Mix_Chunk* killEffect;
+	Mix_Chunk* winEffect;
 
 public:
 	// This constructor may be different from what you've seen before

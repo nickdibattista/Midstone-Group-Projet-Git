@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "Body.h"
 #include "GameManager.h"
+#include <SDL_mixer.h>
 
 class PlayerBody : public Body
 {
@@ -20,7 +21,8 @@ protected:
     float pixels = 16.0f;
     float grounded = false;
     float movSpeed = 4.0f;
-
+private:
+    Mix_Chunk* jumpSoundEffect;
 public:
 
     PlayerBody() : Body{}
@@ -55,6 +57,7 @@ public:
     // use the base class versions of getters
 
     bool OnCreate();
+    void AudioCleanup();
     void Render( float scale = 1.0f );
     void HandleEvents( const SDL_Event& event );
     void Update( float deltaTime );

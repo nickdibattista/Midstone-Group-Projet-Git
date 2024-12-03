@@ -16,16 +16,25 @@ Scene1::~Scene1(){
 }
 
 bool Scene1::OnCreate() {
-	//In-Game Background Music
-	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
-		return -1;
+	//Sound Effects
+	winEffect = Mix_LoadWAV("Sounds/winEffect2.wav");
+	if (!winEffect) {
+		std::cerr << "Failed to load win sound effect: " << Mix_GetError() << std::endl;
 	}
+	else {
+		std::cout << "Win sound effect loaded successfully!" << std::endl;
+	}
+	killEffect = Mix_LoadWAV("Sounds/killEffect.mp3");
+	if (!killEffect) {
+		std::cerr << "Failed to load kill sound effect: " << Mix_GetError() << std::endl;
+	}
+	else {
+		std::cout << "Kill sound effect loaded successfully!" << std::endl;
+	}
+	
 
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
-		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << "\n";
-		return -1;
-	}
+
+	//Background Music
 	Mix_Music* backgroundMusic = Mix_LoadMUS("Sounds/backgroundMusic.mp3");
 	if (!backgroundMusic) {
 		std::cout << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << "\n";
@@ -33,7 +42,7 @@ bool Scene1::OnCreate() {
 	}
 
 	//set music volume
-	Mix_VolumeMusic(32);
+	Mix_VolumeMusic(0);
 	
 	// -1 means loop music indefinitely
 	Mix_PlayMusic(backgroundMusic, -1);  
@@ -238,7 +247,13 @@ void Scene1::doCollisions() {
 			CollisionType(*game->getPlayer(), *platform);
 			collision = true;
 			if (platform->GetIsEndPlatform()) {
-				reachedEnd = true;
+				//reachedEnd = true;
+				if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+					std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+				}
+				if (Mix_PlayChannel(-1, winEffect, 0) == -1) {
+					std::cout << "error playing sound: " << Mix_GetError() << std::endl;
+				}
 			}
 		}
 	}
