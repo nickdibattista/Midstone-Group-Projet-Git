@@ -6,6 +6,10 @@
 // Initialize static member
 MemoryPool* PlayerBody::memory = nullptr;
 
+// For controller dead zone
+static const int JOYSTICK_DEAD_ZONE = 8000;
+
+
 // Memory management implementations
 void* PlayerBody::operator new(size_t size) {
     if (!memory) {
@@ -115,6 +119,42 @@ void PlayerBody::HandleEvents(const SDL_Event& event)
         case SDL_SCANCODE_D:
             vel.x = 0.0f;
             break;
+        }
+    }
+
+    // Handle controller input
+    if (event.type == SDL_CONTROLLERAXISMOTION)
+    {
+        // If left stick moves horizontally
+        if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
+            if (event.caxis.value > JOYSTICK_DEAD_ZONE) {
+                // Stick moved right
+                vel.x = maxSpeed;
+            }
+            else if (event.caxis.value < -JOYSTICK_DEAD_ZONE) {
+                // Stick moved left
+                vel.x = -maxSpeed;
+            }
+            else {
+                // Stick is near center, stop horizontal movement
+                vel.x = 0.0f;
+            }
+        }
+
+        // If left stick moves vertically
+        if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
+            if (event.caxis.value > JOYSTICK_DEAD_ZONE) {
+                // Stick moved down
+                vel.y = -maxSpeed;
+            }
+            else if (event.caxis.value < -JOYSTICK_DEAD_ZONE) {
+                // Stick moved up
+                vel.y = maxSpeed;
+            }
+            else {
+                // Stick is near center, stop vertical movement
+                vel.y = 0.0f;
+            }
         }
     }
 

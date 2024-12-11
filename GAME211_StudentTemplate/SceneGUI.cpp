@@ -1,11 +1,11 @@
-#include "Scene1.h"
+#include "SceneGUI.h"
 #include <VMath.h>
 #include "Button.h"
 
 
 
 // See notes about this constructor in Scene1.h.
-Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
+SceneGUI::SceneGUI(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
     game = game_;
 	renderer = SDL_GetRenderer(window);
@@ -13,14 +13,14 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	yAxis = 15.0f;
 }
 
-Scene1::~Scene1(){
+SceneGUI::~SceneGUI(){
 	if (start) {
 		delete start;
 		start = nullptr;
 	}
 }
 
-bool Scene1::OnCreate() {
+bool SceneGUI::OnCreate() {
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
 
@@ -67,7 +67,7 @@ bool Scene1::OnCreate() {
 }
 
 
-void Scene1::OnDestroy() {
+void SceneGUI::OnDestroy() {
 	// Report Memory Usage if needed
 	// MemoryPool is managed by GameManager
 
@@ -91,7 +91,7 @@ void Scene1::OnDestroy() {
 	IMG_Quit();
 }
 
-void Scene1::Update(const float deltaTime) {
+void SceneGUI::Update(const float deltaTime) {
 
 	// Update player
 	if (game->getPlayer()) {
@@ -99,9 +99,50 @@ void Scene1::Update(const float deltaTime) {
 	}
 }
 
-void Scene1::Render() {
+void SceneGUI::Render() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Opaque black background
 	SDL_RenderClear(renderer);
+
+
+
+
+	// Start ImGui frame
+	ImGui_ImplSDLRenderer2_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
+	// Example of a more "beautiful" UI layout
+	{
+		// Create a full screen background window that is transparent
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::SetNextWindowSize(ImVec2((float)1280, (float)720)); // Use your window size
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f)); // Semi-transparent black
+		ImGui::Begin("BackgroundWindow", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus);
+		ImGui::PopStyleColor();
+
+		// Place a child window for your content
+		ImGui::BeginChild("ContentRegion", ImVec2(400, 200), true);
+		ImGui::Text("Welcome to the SceneGUI!");
+		ImGui::Separator();
+		ImGui::Text("Press 'K' to play a sound!");
+		// Add a nice button
+		if (ImGui::Button("Click Me")) {
+			// Do something on click
+		}
+
+		ImGui::EndChild();
+		ImGui::End();
+	}
+
+	// End ImGui frame and render it
+	ImGui::Render();
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+
+
+
 
 	// Render Button
 	if (start) {
@@ -109,12 +150,12 @@ void Scene1::Render() {
 	}
 
 	// Render the player
-	game->RenderPlayer(0.10f);
+//	game->RenderPlayer(0.10f);
 
 	SDL_RenderPresent(renderer);
 }
 
-void Scene1::HandleEvents(const SDL_Event& event)
+void SceneGUI::HandleEvents(const SDL_Event& event)
 {
 
 	if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_k) {
@@ -140,7 +181,7 @@ void Scene1::HandleEvents(const SDL_Event& event)
 
 }
 
-Vec3 Scene1::getMousePosition()
+Vec3 SceneGUI::getMousePosition()
 {
 
 	Uint32 buttons;

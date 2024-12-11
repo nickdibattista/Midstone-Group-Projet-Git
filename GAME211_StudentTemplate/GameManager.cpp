@@ -1,5 +1,8 @@
 #include "GameManager.h"
 #include "Scene1.h"
+#include "SceneGUI.h"
+
+
 
 MemoryPool* GameManager::npcMemoryPool = nullptr;
 
@@ -106,6 +109,47 @@ bool GameManager::OnCreate() {
         return false;
     }
 
+
+
+
+    // Initialize ImGui Context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); //(void)io;
+    ImGui::StyleColorsDark(); // or ImGui::StyleColorsClassic(); etc.
+
+    // Initialize ImGui for SDL and for SDL_Renderer
+    // Assuming windowPtr->GetSDL_Window() and a valid SDL_Renderer* renderer
+    SDL_Window* sdlWindow = windowPtr->GetSDL_Window();
+    SDL_Renderer* sdlRenderer = SDL_GetRenderer(sdlWindow);
+
+    // Initialize ImGui for SDL2 and SDL_Renderer
+    ImGui_ImplSDL2_InitForSDLRenderer(sdlWindow, sdlRenderer);
+    ImGui_ImplSDLRenderer2_Init(sdlRenderer);
+    io.Fonts->AddFontFromFileTTF("C:/GameDev/OCRA.ttf", 18.0f);
+
+
+
+
+
+    ImGui::StyleColorsDark();
+    // After setting a base style, you can further tweak individual values
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 5.0f;     // Make windows have rounded corners
+    style.FrameRounding = 4.0f;      // Rounded frame corners
+    style.GrabRounding = 4.0f;       // Rounded grab corners
+    style.ScrollbarRounding = 6.0f;  // Rounded scrollbar corners
+
+    // Customize the colors of elements
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.12f, 1.00f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.20f, 0.29f, 0.38f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.27f, 0.40f, 0.54f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.40f, 0.55f, 1.00f);
+
+
     return true;
 }
 
@@ -138,8 +182,16 @@ void GameManager::handleEvents()
 
     //https://www.youtube.com/watch?v=SYrRMr4BaD4&list=PLM7LHX-clszBIGsrh7_3B2Pi74AhMpKhj&index=3
 
-    while (SDL_PollEvent(&event))
-    {
+    while (SDL_PollEvent(&event)) {
+
+
+
+        // Pass event to ImGui
+        ImGui_ImplSDL2_ProcessEvent(&event);
+
+
+
+
         if (event.type == SDL_QUIT)
         {
             isRunning = false;
@@ -159,6 +211,9 @@ void GameManager::handleEvents()
                 break;
             case SDL_SCANCODE_1:
                 LoadScene(1);
+                break;
+            case SDL_SCANCODE_2:
+                LoadScene(2);
                 break;
             default:
                 break;
@@ -194,6 +249,11 @@ void GameManager::OnDestroy() {
         delete windowPtr;
         windowPtr = nullptr;
     }
+
+
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 }
 
 // This might be unfamiliar
@@ -239,6 +299,12 @@ void GameManager::LoadScene( int i )
     {
         case 1:
             currentScene = new Scene1( windowPtr->GetSDL_Window(), this);
+            cout << "changed scene" << endl;
+            break;
+
+        case 2:
+            currentScene = new SceneGUI( windowPtr->GetSDL_Window(), this);
+            cout << "changed scene 22222222222222222 SCENEGUI" << endl;
             break;
         default:
             currentScene = new Scene1( windowPtr->GetSDL_Window(), this );

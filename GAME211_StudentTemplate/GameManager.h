@@ -9,6 +9,11 @@
 #include "MemoryPool.h"
 
 
+#include "../ImGUI/imgui.h"
+#include "../ImGUI/imgui_impl_sdl2.h"
+#include "../ImGUI/imgui_impl_sdlrenderer2.h"
+
+
 class GameManager {
 private:
 	/// These are called "forward declarations" The idea is that a pointer is 

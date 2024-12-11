@@ -1,16 +1,16 @@
-#ifndef SCENE1_H
-#define SCENE1_H
+#ifndef SCENEGUI_H
+#define SCENEGUI_H
 
 
 #include <MMath.h>
-#include "Scene.h"
+#include "SceneGUI.h"
 #include "Button.h"
 #include "PlayerBody.h"
 #include "AudioClass.h"
 
 
 using namespace MATH;
-class Scene1 : public Scene {
+class SceneGUI : public Scene {
 private:
 
 	SDL_GameController* gController = NULL;
@@ -33,8 +33,8 @@ public:
 
 
 
-	Scene1(SDL_Window* sdlWindow, GameManager* game_);
-	~Scene1();
+	SceneGUI(SDL_Window* sdlWindow, GameManager* game_);
+	~SceneGUI();
 	bool OnCreate();
 	void OnDestroy();
 	void Update(const float time);

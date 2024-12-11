@@ -11,7 +11,7 @@ int main(int argc, char* args[]) { /// Standard C-style entry point, you need to
 	if (status == true) {
 		ptr->Run();
 	} else if (status == false) {
-		std::cerr << "Fatal error occured. Cannot start this program" << std::endl;
+		std::cout << "Fatal error occured. Cannot start this program" << std::endl;
 	}
 	ptr->OnDestroy();
 	delete ptr;
