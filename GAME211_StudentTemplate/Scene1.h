@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "Button.h"
 #include "PlayerBody.h"
+#include "AudioClass.h"
 
 
 using namespace MATH;
@@ -19,7 +20,8 @@ private:
     Matrix4     inverseProjection;	// set in OnCreate()
 	Button *start;
 	
-
+	AudioClass* audio;
+	std::shared_ptr<AudioClass> audio_ss;
 
 public:
 	// This constructor may be different from what you've seen before

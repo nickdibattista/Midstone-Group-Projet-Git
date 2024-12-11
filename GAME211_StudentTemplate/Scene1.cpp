@@ -4,7 +4,6 @@
 
 
 
-
 // See notes about this constructor in Scene1.h.
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
@@ -36,6 +35,11 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 
+	// Initialize the audio system here
+	audio = new AudioClass();
+	// or if you want to use shared_ptr:
+	// audio_ss = std::make_shared<AudioClass>();
+
 	// Initialize Button
 	start = new Button("Clyde.png", Vec3(10.0f, 8.0f, 0.0f), this);
 	if (!start->OnCreate()) {
@@ -51,13 +55,15 @@ void Scene1::OnDestroy() {
 	// Report Memory Usage if needed
 	// MemoryPool is managed by GameManager
 
-	// Clean up Button
+	if (audio) {
+		delete audio;
+		audio = nullptr;
+	}
+
 	if (start) {
 		delete start;
 		start = nullptr;
 	}
-
-	// Quit SDL_image
 	IMG_Quit();
 }
 
@@ -86,6 +92,13 @@ void Scene1::Render() {
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
+
+	if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_k) {
+		if (audio) {
+			audio->PlaySound("sound/SKULLTRUMPET.ogg");
+		}
+	}
+
 	// Send events to player as needed
 	if (game->getPlayer()) {
 		game->getPlayer()->HandleEvents(event);
@@ -93,14 +106,18 @@ void Scene1::HandleEvents(const SDL_Event& event)
 
 	Vec3 mousePos = getMousePosition();
 
-	if (event.button.type == SDL_MOUSEBUTTONUP
-		&& event.button.button == SDL_BUTTON_LEFT)
-	{
-		if (start->clicked(mousePos))
-		{
-			printf("mouse clicked start\n");
-		}
-	}
+	//if (event.button.type == SDL_MOUSEBUTTONUP
+	//	&& event.button.button == SDL_BUTTON_LEFT)
+	//{
+	//	if (start->clicked(mousePos))
+	//	{
+	//		printf("mouse clicked start\n");
+	//	}
+	//}
+
+	//if (/*event.button.type == SDL_MOUSEBUTTONDOWN &&*/ event.key.keysym.sym == SDLK_k) {
+	//	audio->PlaySound("sound/SKULLTRUMPET.ogg");
+	//}
 
 }
 

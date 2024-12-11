@@ -24,9 +24,13 @@ bool GameManager::OnCreate() {
         return false;
     }
     if (windowPtr->OnCreate() == false) {
+
+
         std::cerr << "Window::OnCreate() failed." << std::endl;
         OnDestroy();
         return false;
+
+
     }
 
     // Initialize Timer
